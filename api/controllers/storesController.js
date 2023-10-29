@@ -175,7 +175,7 @@ async function search(req, res) {
 
   if (!errors.isEmpty()) {
     return res.status(500).json({
-      ResponseCode: 500,
+      responseCode: 500,
       Data: [],
       Message: errors.array()[0].msg
     });
@@ -193,7 +193,7 @@ async function search(req, res) {
   if (!await isValidStore(store)) {
     console.log('\x1b[33m%s\x1b[0m', url)
     return res.status(500).json({
-      ResponseCode: 500,
+      responseCode: 500,
       Data: {},
       Message: `${store} is not supported!`
     });
@@ -413,58 +413,58 @@ async function search(req, res) {
     // var $ = cheerio.load(await page.content());
 
     /* Check Product Sizes */
-    let Size = req.body.Size;
+    // let Size = req.body.Size;
 
-    if (Size) { // Size is optional
+    // if (Size) { // Size is optional
 
-      // Not Instock sizes
-      let requiredSize = Size.toString();
-      var NotInStockSizes = await elementSelector(page, data.notInStockSizes.selector, data.notInStockSizes.attribute || null, data.notInStockSizes.regex || null, data.notInStockSizes.groups || [], true)
-      var isOutStock
-      if (data.debug) console.log(NotInStockSizes)
-      NotInStockSizes.forEach(item => { if (item.trim() === requiredSize.trim()) isOutStock = true })
-      if (isOutStock) {
-        return res.status(500).json({
-          ResponseCode: 500,
-          Data: {},
-          Message: `Size ${Size} is Out Of Stock!`
-        });
-      }
+    //   // Not Instock sizes
+    //   let requiredSize = Size.toString();
+    //   var NotInStockSizes = await elementSelector(page, data.notInStockSizes.selector, data.notInStockSizes.attribute || null, data.notInStockSizes.regex || null, data.notInStockSizes.groups || [], true)
+    //   var isOutStock
+    //   if (data.debug) console.log(NotInStockSizes)
+    //   NotInStockSizes.forEach(item => { if (item.trim() === requiredSize.trim()) isOutStock = true })
+    //   if (isOutStock) {
+    //     return res.status(500).json({
+    //       responseCode: 500,
+    //       Data: {},
+    //       Message: `Size ${Size} is Out Of Stock!`
+    //     });
+    //   }
 
-      // InStock Sizes
-      var InStockSizes = await elementSelector(page, data.inStockSizes.selector, data.inStockSizes.attribute || null, data.inStockSizes.regex || null, data.inStockSizes.groups || [], true)
-      var isInstock
-      InStockSizes.forEach(item => { if (item.trim() === requiredSize.trim()) isInstock = true })
-      if (data.debug) console.log(InStockSizes)
-      if (!isInstock) {
-        return res.status(500).json({
-          ResponseCode: 500,
-          Data: {},
-          Message: `Size ${Size} is not available!`
-        });
-      }
+    //   // InStock Sizes
+    //   var InStockSizes = await elementSelector(page, data.inStockSizes.selector, data.inStockSizes.attribute || null, data.inStockSizes.regex || null, data.inStockSizes.groups || [], true)
+    //   var isInstock
+    //   InStockSizes.forEach(item => { if (item.trim() === requiredSize.trim()) isInstock = true })
+    //   if (data.debug) console.log(InStockSizes)
+    //   if (!isInstock) {
+    //     return res.status(500).json({
+    //       responseCode: 500,
+    //       Data: {},
+    //       Message: `Size ${Size} is not available!`
+    //     });
+    //   }
 
-      // Click Size to appear the true price
-      if (isInstock) {
-        if (data.clickSize) {
-          await elementClick(page,
-            data.clickSize.replace("{{size}}", Size.trim())
-          );
-          await delay(2000);
-        }
-      }
-    }
+    //   // Click Size to appear the true price
+    //   if (isInstock) {
+    //     if (data.clickSize) {
+    //       await elementClick(page,
+    //         data.clickSize.replace("{{size}}", Size.trim())
+    //       );
+    //       await delay(2000);
+    //     }
+    //   }
+    // }
 
     // /* Load Page Content */
     // var $ = cheerio.load(await page.content()); //it changes to jquery
 
 
-    var Response = {};
-    Response.Url = req.body.Url;
+    var response = {};
+    response.Url = req.body.Url;
 
-    Response.Name = await elementSelector(page, data.title.selector || null, data.title.attribute || null, data.title.regex || null, data.title.groups || [], false) || "";
+    response.name = await elementSelector(page, data.title.selector || null, data.title.attribute || null, data.title.regex || null, data.title.groups || [], false) || "";
     var strCategory = await elementSelector(page, data.category.selector || null, data.category.attribute || null, data.category.regex || null, data.category.groups || [], true) || "";
-    Response.Category = strCategory.join(" ").trim()
+    response.Category = strCategory.join(" ").trim()
     var strPrice = await elementSelector(page, data.price.selector, data.price.attribute || null, data.price.regex || null, data.price.groups || [], false) || ""
     //Extract clean price without decimal
     if (strPrice.includes(",") || strPrice.includes(".")) {
@@ -476,15 +476,15 @@ async function search(req, res) {
       strPrice = strPrice[0]
     }
 
-    Response.Price = strPrice
-    Response.Color = await elementSelector(page, data.color.selector || null, data.color.attribute || null, data.color.regex || null, data.color.groups || [], false) || "";
-    Response.Size = Size;
+    response.price = strPrice
+    response.color = await elementSelector(page, data.color.selector || null, data.color.attribute || null, data.color.regex || null, data.color.groups || [], false) || "";
+    response.size = Size;
 
-    //  if(!Response.Price){
-    //    Response.Price = $('div#productInfo > div#rightInfoBar > div.info-panel:nth-child(1) > div.main-info-area > div:nth-child(3) > div.price-area > div > div > span.advanced-price').text().replace(/\n/g, "").trim() || "";
+    //  if(!response.Price){
+    //    response.Price = $('div#productInfo > div#rightInfoBar > div.info-panel:nth-child(1) > div.main-info-area > div:nth-child(3) > div.price-area > div > div > span.advanced-price').text().replace(/\n/g, "").trim() || "";
     //  }
-    //  if(Response.Price){
-    //      Response.Price = (Response.Price).replace(/\D/g, ''); // Extract Number's from String
+    //  if(response.Price){
+    //      response.Price = (response.Price).replace(/\D/g, ''); // Extract Number's from String
     //  }
 
     /* See All Images */
@@ -503,12 +503,12 @@ async function search(req, res) {
 
     }
 
-    Response.Images = await strImages
+    response.Images = await strImages
 
     console.log('\x1b[32m%s\x1b[0m', url)
     return res.status(200).json({
-      ResponseCode: 200,
-      Data: Response,
+      responseCode: 200,
+      Data: response,
       Message: "Success."
     });
   } catch (e) {
@@ -516,7 +516,7 @@ async function search(req, res) {
     console.log(userAgent)
     console.log('\x1b[31m%s\x1b[0m', url)
     return res.status(500).json({
-      ResponseCode: 500,
+      responseCode: 500,
       Data: {},
       Message: "Some error occured Or data not found, please try again."
     });
