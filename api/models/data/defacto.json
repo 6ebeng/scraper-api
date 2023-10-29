@@ -1,0 +1,65 @@
+{
+  "debug": false,
+  "isHeadless": true,
+  "scrollToBottom": true,
+  "proxies": [],
+  "waitUntill": "domcontentloaded",
+  "blockResourceTypes": ["image","media","stylesheet", "font", "other", "fetch"],
+  "whiteListUrls": [
+    "https://www.defacto.com",
+    "https://dfcdn.defacto.com"
+  ],
+  "blockUrls": [
+    "entry.footer.bundle.js",
+    "entry.header.bundle.js",
+    "Resource_tr-tr.js",
+    "GetBunsarSimilar",
+    "GetBunsarCompleteTheLook",
+    "main.bundle.js"
+  ],
+  "container": "div.product-card__details",
+  "notInStockSizes": {
+    "attribute": "value",
+    "regex": "",
+    "groups": [],
+    "selector": "div.product-size-selector__buttons > button.product-no-stock"
+  },
+  "inStockSizes": {
+    "attribute": "value",
+    "regex": "",
+    "groups": [],
+    "selector": "div.product-size-selector__buttons > button:not(.product-no-stock)"
+  },
+  "clickSize": "",
+  "title": {
+    "attribute": "",
+    "regex": "",
+    "groups": [],
+    "selector": "h1.product-card__name"
+  },
+  "category": {
+    "attribute": "",
+    "regex": "",
+    "groups": [1],
+    "selector": "//ol[contains(@class,'breadcrumb')]/li[last()-2] | //ol[contains(@class,'breadcrumb')]/li[last()-1]"
+  },
+  "price": {
+    "attribute": "",
+    "regex": "",
+    "groups": [],
+    "selector": "//div[contains(@class,'product-card__details__left')]/div[contains(@class,'product-card__price-list')] /div[contains(@class,'product-card__price')][last()]"
+  },
+  "color": {
+    "attribute": "",
+    "regex": "(?<=Renk : ).+",
+    "groups": [],
+    "selector": "//div[@class='sideMenu__box']/ul/li[contains(.,'Renk')]"
+  },
+  "images": {
+    "attribute": "src",
+    "regex": "",
+    "groups": [],
+    "selector": "div.product-card__image-slider--container > div.swiper-wrapper > div.swiper-slide > div.swiper-item > img"
+  }
+
+}

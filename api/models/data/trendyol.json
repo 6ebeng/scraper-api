@@ -1,0 +1,110 @@
+{
+    "debug": false,
+    "isHeadless": true,
+    "scrollToBottom": false,
+    "proxies": [],
+    "waitUntill": "domcontentloaded",
+    "blockResourceTypes": ["media","stylesheet","font","fetch"],
+    "whiteListUrls": [
+"trendyol.com/",
+"https://cdn.dsmcdn.com"
+    ],
+    "blockUrls": [
+"https://cdn.dsmcdn.com/web",
+"https://www.trendyol.com/Content",
+"https://cdn.dsmcdn.com//seller-ads",
+"https://cdn.dsmcdn.com/indexing-sticker-stamp",
+"_org_thumb.jpg",
+"trendyol.com/discovery-web-socialgw-service",
+"discovery-web-websfxcustomersupport-santral",
+"cdn.dsmcdn.com/mweb/production",
+"trendyol.com/discovery-sellerstore-webgw-service",
+"/ty171/",
+"/ty448/",
+"/ty364/",
+"/ty9/",
+"/ty520/",
+"/ty325/",
+"/ty79/",
+"/ty69/",
+"/ty515/",
+"/ty314/",
+"/ty326/",
+"/ty331/",
+"/ty534/",
+"/ty159/",
+"/ty331/",
+"/ty438/",
+"/ty326/",
+"/ty533/",
+"/ty167/",
+"/ty68/",
+"/ty447/",
+"/ty407/",
+"/ty406/",
+"/ty447/",
+"/ty497/",
+"/ty489/",
+"/ty532/",
+"/ty13/",
+"/ty82/",
+"/ty194/",
+"/ty470/",
+"/ty324/",
+"/discovery-web-websfxproductrecommendation-santral/",
+"/frontend/web/production/dom-event-tracker",
+
+
+
+"/mnresize/1200/1800",
+"/discovery-web-productgw-service"
+
+
+
+    ],
+    "container": "div.product-container",
+    "notInStockSizes": {
+      "attribute": "",
+      "regex": "",
+      "groups": [],
+      "selector": "//div[contains(@class,'variants')]/div[contains(@class,'sp-itm')][contains(@class,'so')] | //div[contains(@class,'slc-txt-w')]/div[contains(@class,'pr-slc')][contains(@class,'passive')]"
+    },
+    "inStockSizes": {
+      "attribute": "",
+      "regex": "",
+      "groups": [],
+      "selector": "//div[contains(@class,'variants')]/div[contains(@class,'sp-itm')][not(contains(@class,'so'))] | //div[contains(@class,'slc-txt-w')]/div[contains(@class,'pr-slc')][not(contains(@class,'passive'))]"
+    },
+    "clickSize": "",
+    "title": {
+      "attribute": "",
+      "regex": "",
+      "groups": [],
+      "selector": "h1.pr-new-br > span"
+    },
+    "category": {
+      "attribute": "",
+      "regex": "",
+      "groups": [],
+      "selector": "//div[@id='marketing-product-detail-breadcrumb']/div[count(a)=4]/a[last()-1 ]/span | //div[@id='marketing-product-detail-breadcrumb']/div[count(a)=5]/a[last()-2 ]/span | //div[@id='marketing-product-detail-breadcrumb']/div[count(a)=5]/a[last()-1 ]/span | //div[@id='marketing-product-detail-breadcrumb']/div[count(a)=6]/a[last()-3 ]/span | //div[@id='marketing-product-detail-breadcrumb']/div[count(a)=6]/a[last()-2 ]/span | //div[@id='marketing-product-detail-breadcrumb']/div[count(a)=6]/a[last()-1 ]/span | //div[@id='marketing-product-detail-breadcrumb']/div[count(a)=7]/a[last()-4 ]/span | //div[@id='marketing-product-detail-breadcrumb']/div[count(a)=7]/a[last()-3 ]/span | //div[@id='marketing-product-detail-breadcrumb']/div[count(a)=7]/a[last()-2 ]/span | //div[@id='marketing-product-detail-breadcrumb']/div[count(a)=7]/a[last()-1 ]/span | //div[@id='marketing-product-detail-breadcrumb']/div[count(a)=8]/a[last()-5 ]/span | //div[@id='marketing-product-detail-breadcrumb']/div[count(a)=8]/a[last()-4 ]/span | //div[@id='marketing-product-detail-breadcrumb']/div[count(a)=8]/a[last()-3 ]/span | //div[@id='marketing-product-detail-breadcrumb']/div[count(a)=8]/a[last()-2 ]/span | //div[@id='marketing-product-detail-breadcrumb']/div[count(a)=8]/a[last()-1]/span"
+    },
+    "price": {
+      "attribute": "",
+      "regex": "",
+      "groups": [],
+      "selector": "//span[contains(@class,'prc-slg')] | //div/span[contains(@class,'prc-dsc')]"
+    },
+    "color": {
+      "attribute": "title",
+      "regex": "",
+      "groups": [],
+      "selector": "div.slicing-attributes > section:nth-of-type(1) > div[class*=styles-module_sliderBase] > div[class*=styles-module_slider] > a.selected.slc-img"
+    },
+    "images": {
+      "attribute": "src",
+      "regex": "\\S+\\.com|\\/ty\\d+\\/\\S+",
+      "groups": [],
+      "selector": "//div[contains(@class,'base-product-image')]/div/img | //div[contains(@class,'product-slide')][not(contains(@class,'focused'))]/img"
+    }
+  
+  }

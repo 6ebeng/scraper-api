@@ -1,0 +1,74 @@
+{
+  "debug": false,
+  "isHeadless": true,
+  "scrollToBottom": false,
+  "proxies": [],
+  "waitUntill": "domcontentloaded",
+  "blockResourceTypes": ["image", "media", "stylesheet", "font", "other", "fetch"],
+  "whiteListUrls": [
+    "https://www.lcwaikiki.com"
+  ],
+  "blockUrls": [
+    "https://www.lcwaikiki.com/ReactLCW",
+    "https://www.lcwaikiki.com/Resource/Scripts/tracking/",
+    "https://www.lcwaikiki.com/Resource/Scripts/favoritelist",
+    "https://www.lcwaikiki.com/Resource/Scripts/slick",
+    "https://www.lcwaikiki.com/Resource/Scripts/omnichannel",
+    "https://www.lcwaikiki.com/Resource/Scripts/masterTheme",
+    "https://www.lcwaikiki.com/Resource/Scripts/imagezoom",
+    "https://www.lcwaikiki.com/tr-TR/TR/ajax/home",
+    "https://www.lcwaikiki.com/Resource/Scripts/lib/pinch-zoom",
+    "https://www.lcwaikiki.com/Resource/Scripts/validate?",
+    "https://www.lcwaikiki.com/Resource/Scripts/cookie-seal.js",
+    "https://www.lcwaikiki.com/NYhlO6K0m/LQa/ET5kjQ/amED6Qhr/aixKAQ/Qj9/3SmwlThIB",
+    "https://www.lcwaikiki.com/NYhlO6K0m/LQa/ET5kjQ/amED6Qhr/aixKAQ/Qj9/3SmwlThIB",
+    "https://www.lcwaikiki.com/NYhlO6K0m/LQa/ET5kjQ/amED6Qhr/aixKAQ/Qj9/3SmwlThIB",
+    "https://www.lcwaikiki.com/Resource/Scripts/lib/lazysizes",
+    "https://www.lcwaikiki.com/Resource/Scripts/lib/bootstrapselect"
+  ],
+  "container": "div.product-detail",
+  "notInStockSizes": {
+    "attribute": "size",
+    "regex": "",
+    "groups": [],
+    "selector": "//div[contains(@class,'main-size-area')]/div[contains(@class,'option-sizes')]/div[contains(@id,'option-size')]/*/descendant-or-self::*[contains(@class,'disabledNotSelected')][not(self::div)][not(self::input)][not(self::span)][not(self::b)][not(self::i)]"
+  },
+  "inStockSizes": {
+    "attribute": "size",
+    "regex": "",
+    "groups": [],
+    "selector": "div.main-size-area > div.option-sizes >div#option-size > a:not(.disabledNotSelected)"
+  },
+  "clickSize": "",
+  "title": {
+    "attribute": "",
+    "regex": "",
+    "groups": [],
+    "selector": "div#productInfo > div#rightInfoBar > div.info-panel:nth-child(1) > div.main-info-area > div.title-info > div > div.product-title"
+  },
+  "category": {
+    "attribute": "",
+    "regex": "",
+    "groups": [],
+    "selector": "//ul[contains(@class,'breadcrumb')]/li[last()-1]"
+  },
+  "price": {
+    "attribute": "",
+    "regex": "",
+    "groups": [],
+    "selector": "//div[contains(@class,'price-area')]/div/div[last()]/*[contains(text(),'TL')]"
+  },
+  "color": {
+    "attribute": "alt",
+    "regex": "",
+    "groups": [],
+    "selector": "div#productInfo > div#rightInfoBar > div.info-panel:nth-child(3) > div.colors-panel > div.colors-area > a.color-option.active > div.color-box > div"
+  },
+  "images": {
+    "attribute": "data-large-img-url",
+    "regex": "",
+    "groups": [],
+    "selector": "div#productSliderPhotos > div.product-images-desktop > div > img"
+  }
+
+}
