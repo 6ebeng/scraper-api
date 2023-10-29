@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js"
+    "dev": "nodemon -L --watch api index.js"
   },
   "keywords": [
     "web",
@@ -31,5 +31,8 @@
     "ua-parser-js": "^1.0.2",
     "uuid": "^9.0.0",
     "xvfb": "^0.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }

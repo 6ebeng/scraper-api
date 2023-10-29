@@ -2,7 +2,7 @@
 -- api
 |   | -- controllers
 |  |   | -- storesController.js
-|   | -- helper
+|   | -- helper 
 |  |   | -- bypassDetections.js
 |  |   | -- bypassWebgl.js
 |  |   | -- packages.js

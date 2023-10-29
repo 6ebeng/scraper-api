@@ -9,14 +9,14 @@ services:
       target: production
     ports:
       - 4200:4200
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-        reservations:
-          memory: 256M
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 512M
+    #     reservations:
+    #       memory: 256M
     volumes:
-      - ./src:/app/src
+      - ./:/app/
     stdin_open: true
     tty: true
     env_file:

@@ -5,7 +5,7 @@ function getExcludedNames() {
   const gitignorePath = path.join(process.cwd(), ".gitignore");
   const gitignoreContent = fs.existsSync(gitignorePath)
     ? fs.readFileSync(gitignorePath, "utf8")
-    : "";
+    : ""; 
   const gitignoreNames = gitignoreContent
     .split("\n")
     .map((name) => name.trim())

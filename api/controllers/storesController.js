@@ -431,9 +431,9 @@ async function search(req, res) {
     //     });
     //   }
 
-    //   // InStock Sizes
-    //   var InStockSizes = await elementSelector(page, data.inStockSizes.selector, data.inStockSizes.attribute || null, data.inStockSizes.regex || null, data.inStockSizes.groups || [], true)
-    //   var isInstock
+      // InStock Sizes
+      var InStockSizes = await elementSelector(page, data.inStockSizes.selector, data.inStockSizes.attribute || null, data.inStockSizes.regex || null, data.inStockSizes.groups || [], true)
+      // var isInstock
     //   InStockSizes.forEach(item => { if (item.trim() === requiredSize.trim()) isInstock = true })
     //   if (data.debug) console.log(InStockSizes)
     //   if (!isInstock) {
@@ -459,7 +459,7 @@ async function search(req, res) {
     // var $ = cheerio.load(await page.content()); //it changes to jquery
 
 
-    var response = {};
+
     response.Url = req.body.Url;
 
     response.name = await elementSelector(page, data.title.selector || null, data.title.attribute || null, data.title.regex || null, data.title.groups || [], false) || "";
@@ -478,7 +478,7 @@ async function search(req, res) {
 
     response.price = strPrice
     response.color = await elementSelector(page, data.color.selector || null, data.color.attribute || null, data.color.regex || null, data.color.groups || [], false) || "";
-    response.size = Size;
+    //response.size = Size;
 
     //  if(!response.Price){
     //    response.Price = $('div#productInfo > div#rightInfoBar > div.info-panel:nth-child(1) > div.main-info-area > div:nth-child(3) > div.price-area > div > div > span.advanced-price').text().replace(/\n/g, "").trim() || "";
