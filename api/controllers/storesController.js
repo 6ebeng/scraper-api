@@ -310,8 +310,8 @@ async function search(req, res) {
 
 
     browser = await puppeteer.launch({
-      headless: data.isHeadless,
-      executablePath: '/usr/bin/google-chrome',
+      headless: data.isHeadless? 'new' : false,
+      executablePath: '/usr/bin/chromium-browser',
       args: args,
       slowMo: 0
     });
@@ -358,7 +358,7 @@ async function search(req, res) {
     //Block unnecessary resource types and urls
     await blockResources(page,data)
 
-    console.log(await page.browser().userAgent())
+    //console.log(await page.browser().userAgent())
     // await bypassWebgl(page,userAgent,"Intel Inc.")
     // Bypass detections
     // await bypass(page)
@@ -521,10 +521,10 @@ async function search(req, res) {
       Message: "Some error occured Or data not found, please try again."
     });
   } finally {
-    browser.close();
     if (!data.isHeadless) {
       xvfb.stopSync();
     }
+    browser.close();
   }
 }
 
