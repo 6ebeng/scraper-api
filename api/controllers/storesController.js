@@ -51,7 +51,7 @@ function validate(method) {
 
 
 async function mainSelector(page, selector, attribute) {
-  if (selector.startsWith('//')) {
+  if (selector.startsWith('//') || selector.startsWith('(//')) {
     if (attribute) {
       return await page.evaluate(async ({ selector, attribute }) => {
         return Array.from((function () { var arr = []; var results = document.evaluate(selector, document, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null); while (node = results.iterateNext()) { arr.push(node) } return arr; })()).map(el => (el.getAttribute(attribute).replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, "\"").replace(/&39;/g, "'").replace(/&amp;/g, "&").replace(/\n/g, "").trim()))
@@ -140,7 +140,7 @@ async function blockResources(page,data){
     if (!resourceType) {
       for (let index = 0; index < data.whiteListUrls.length; index++) {
         if (request.url().includes(data.whiteListUrls[index])) url = null
-      }
+      } 
     }
     if (!url) {
       for (let index = 0; index < data.blockUrls.length; index++) {
@@ -379,12 +379,12 @@ async function search(req, res) {
 
     // debug
     if (data.debug) {
-      fs.writeFileSync('debug/docs/' + store + '.html', await page.evaluate(() => {
-        return document.querySelectorAll("html")[0].outerHTML
-      }), {
-        encoding: 'utf8',
-        flag: 'w'
-      })
+      // fs.writeFileSync('debug/docs/' + store + '.html', await page.evaluate(() => {
+      //   return document.querySelectorAll("html")[0].outerHTML
+      // }), {
+      //   encoding: 'utf8',
+      //   flag: 'w'
+      // })
 
       // console.log(await page.evaluate(() => {
       //   var arr = []
@@ -406,7 +406,7 @@ async function search(req, res) {
     }
 
     await page.waitForSelector(data.container, {
-      timeout: 15000
+      timeout: 30000
     });
 
     // /* Load Page Content */
@@ -513,7 +513,7 @@ async function search(req, res) {
     });
   } catch (e) {
     console.log('err', e)
-    console.log(userAgent)
+    //console.log(userAgent)
     console.log('\x1b[31m%s\x1b[0m', url)
     return res.status(500).json({
       responseCode: 500,

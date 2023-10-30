@@ -78,7 +78,7 @@
     "attribute": "",
     "regex": "",
     "groups": [],
-    "selector": "//div[@class='sticky-prices']/span/div[@data-testid='prices.wrapper']/descendant::span[contains(text(),'TL')][last()]"
+    "selector": "(//*[@data-testid='currentPrice'][contains(.,'TL')][last()])[1]"
   },
   "color": {
     "attribute": "",
