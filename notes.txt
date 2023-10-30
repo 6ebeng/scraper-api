@@ -1,0 +1,21 @@
+    /*
+      Uses for Windows
+    */
+    // browser = await puppeteer.launch({
+    //   headless: data.isHeadless,
+    //   executablePath: 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    //   userDataDir: 'C:/Users/Tishko/AppData/Local/Google/Chrome/User Data/Profile 3',
+    //   args: ["--no-sandbox", '--window-size=1200,800'],
+    //   defaultViewport: null
+    // });
+
+    /*
+      Uses for Linux
+    */
+    // Uses for Virtual Display
+    // sudo apt-get install -y xvfb
+    // sudo apt-get -y install xorg xvfb gtk2-engines-pixbuf
+    // sudo apt-get -y install dbus-x11 xfonts-base xfonts-100dpi xfonts-75dpi xfonts-cyrillic xfonts-scalable
+    // kill -- "-$xvfb_pid"
+    // Xvfb -ac :10 -screen 0 1200x800x24 &
+    // export DISPLAY=:10
