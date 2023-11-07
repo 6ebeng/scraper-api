@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /*
  * Purpose : To load all Node.Js Packages
@@ -6,33 +6,39 @@
  * Developed By  : Tishko Rasoul (tishko.rasoulgmail.com)
  */
 
-const puppeteer = require("puppeteer-extra"),
-  stealth = require("puppeteer-extra-plugin-stealth"),
-  scrollToBottom = require("scroll-to-bottomjs"),
-  { check, validationResult } = require("express-validator"),
-  fs = require("fs"),
-  Xvfb = require("xvfb"),
-  useProxy = require("puppeteer-page-proxy"),
-  elementSelector = require("./selector"),
-  { elementClick } = require("./click"),
-  { validate } = require("./validate"),
-  { delay } = require("./delay"),
-  { isValidStore } = require("./validate"),
-  { blockResources } = require("./blockResources");
+const puppeteer = require('puppeteer-extra'),
+	stealth = require('puppeteer-extra-plugin-stealth'),
+	scrollToBottom = require('scroll-to-bottomjs'),
+	{ check, validationResult } = require('express-validator'),
+	fs = require('fs'),
+	Xvfb = require('xvfb'),
+	useProxy = require('puppeteer-page-proxy'),
+	{ elementSelector } = require('./selector'),
+	{ elementClick } = require('./click'),
+	{ validate } = require('./validate'),
+	{ delay } = require('./delay'),
+	{ isValidStore } = require('./validate'),
+	{ blockResources } = require('./blockResources'),
+	{ cleanPrice } = require('./cleanPrice'),
+	{ GetOption3AndOption2AndOption1, GetOption2AndOption1, GetOption1 } = require('./getVariants');
 
 module.exports = {
-  delay,
-  puppeteer,
-  scrollToBottom,
-  check,
-  validationResult,
-  fs,
-  validate,
-  Xvfb,
-  stealth,
-  useProxy,
-  elementSelector,
-  elementClick,
-  isValidStore,
-  blockResources,
+	delay,
+	puppeteer,
+	scrollToBottom,
+	check,
+	validationResult,
+	fs,
+	validate,
+	Xvfb,
+	stealth,
+	useProxy,
+	elementSelector,
+	elementClick,
+	isValidStore,
+	blockResources,
+	cleanPrice,
+	GetOption3AndOption2AndOption1,
+	GetOption2AndOption1,
+	GetOption1,
 };

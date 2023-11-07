@@ -3,7 +3,6 @@
   "isHeadless": false,
   "scrollToBottom": false,
   "proxies": [
-    "8.8.8.8:8080"
   ],
   "waitUntill": "domcontentloaded",
   "blockResourceTypes": [],

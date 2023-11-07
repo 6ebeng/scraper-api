@@ -1,0 +1,24 @@
+{
+  "handle": "https://www.defacto.com.tr/genis-paca-yuksek-bel-jean-pantolon-2558124",
+  "title": "SHEIN EZwear Ribbed Knit Flare Leg",
+  "descriptions": "",
+  "category": "Giyim Jean Pantolon",
+  "vendor": "Shein",
+  "currency": "USD",
+  "locale": "US",
+  "options": ["size", "color", "model"],
+  "variants": [
+    {
+      "price": 20.99,
+      "sku": "sw2209191363350335",
+      "options": [
+        { "option1Name": "size", "value": "S" },
+        { "option2Name": "color", "value": "Light grey" },
+        { "option3Name": "model", "value": "overSize" }
+      ],
+      "quantity": 1,
+      "imageSrc": "https://img.ltwebstatic.com/images3_pi/2020/09/22/1600765042c2d1b3b2b2b2b2b2b2b2b2b2b2b2b2b_6_thumbnail_900x1199.webp"
+    }
+  ],
+  "message": "success"
+}

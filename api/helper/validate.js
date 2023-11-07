@@ -1,12 +1,15 @@
-const fs = require("fs");
-const { check } = require("express-validator");
+const { check } = require("express-validator"),
+  fs = require("fs");
 
 function validate(method) {
   switch (method) {
     case "search":
       {
         return [
-          check("Url").notEmpty().withMessage("Url field is required").trim(),
+          check("handle")
+            .notEmpty()
+            .withMessage("handle field is required")
+            .trim(),
         ];
       }
       break;
@@ -15,7 +18,7 @@ function validate(method) {
 
 async function isValidStore(store) {
   if (
-    Array.from(fs.readdirSync("./../models/data"))
+    Array.from(fs.readdirSync("./api/models/data"))
       .map((e) => e.replace(".json", ""))
       .includes(store)
   )

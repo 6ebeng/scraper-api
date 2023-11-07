@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /*
  * Purpose : Website Search API
@@ -7,100 +7,95 @@
  */
 
 const {
-  puppeteer,
-  scrollToBottom,
-  check,
-  validationResult,
-  fs,
-  Xvfb,
-  stealth,
-  useProxy,
-  elementSelector,
-  elementClick,
-  delay,
-  isValidStore,
-  blockResources,
-} = require("../helper/packages.js");
-
-// const bypass = require("../helper/bypassDetections.js");
-// const bypassWebgl = require("../helper/bypassWebgl.js");
+	puppeteer,
+	scrollToBottom,
+	validationResult,
+	fs,
+	Xvfb,
+	stealth,
+	useProxy,
+	elementSelector,
+	delay,
+	isValidStore,
+	blockResources,
+	GetOption3AndOption2AndOption1,
+	GetOption2AndOption1,
+	GetOption1,
+} = require('../helper/packages.js');
 
 let storesController = { search };
 
 async function search(req, res) {
-  var browser;
-  /* To Check Validation json */
-  let errors = validationResult(req);
+	var browser;
+	/* To Check Validation json */
+	let errors = validationResult(req);
 
-  if (!errors.isEmpty()) {
-    return res.status(500).json({
-      responseCode: 500,
-      Data: [],
-      Message: errors.array()[0].msg,
-    });
-  }
+	if (!errors.isEmpty()) {
+		return res.status(500).json({
+			Message: errors.array()[0].msg,
+		});
+	}
 
-  let url = req.body.Url;
-  console.log("\x1b[34m%s\x1b[0m", url);
+	let handle = req.body.handle;
+	console.log('\x1b[34m%s\x1b[0m', handle);
 
-  var match = await url.match(
-    "^((http[s]?|ftp)://)?/?([^/.]+.)*?([^/.]+.[^:/s.]{1,3}(.[^:/s.]{1,2})?(:d+)?)($|/)([^#?s]+)?(.*?)?(#[w-]+)?$"
-  );
-  let store = await match[4].replace(/\..+/g, "");
+	var match = await handle.match(
+		'^((http[s]?|ftp)://)?/?([^/.]+.)*?([^/.]+.[^:/s.]{1,3}(.[^:/s.]{1,2})?(:d+)?)($|/)([^#?s]+)?(.*?)?(#[w-]+)?$'
+	);
+	let store = await match[4].replace(/\..+/g, '');
 
-  if (!(await isValidStore(store))) {
-    console.log("\x1b[33m%s\x1b[0m", url);
-    return res.status(500).json({
-      responseCode: 500,
-      Data: {},
-      Message: `${store} is not supported!`,
-    });
-  }
-  const data = await require("../models/data/" + store);
+	if (!(await isValidStore(store))) {
+		console.log('\x1b[33m%s\x1b[0m', handle);
+		return res.status(500).json({
+			data: {},
+			Message: `${store} is not supported!`,
+		});
+	}
+	const data = await require('../models/data/' + store);
 
-  const userAgents = [
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36",
-    "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:70.0) Gecko/20100101 Firefox/70.0",
-  ];
-  //const userAgent = userAgents[Math.floor(Math.random() * userAgents.length)]
-  const userAgent =
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36";
-  //const userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"
+	const userAgents = [
+		'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+		'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36',
+		'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:70.0) Gecko/20100101 Firefox/70.0',
+	];
+	//const userAgent = userAgents[Math.floor(Math.random() * userAgents.length)]
+	const userAgent =
+		'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36';
+	//const userAgent = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/105.0.0.0 Safari/537.36"
 
-  const xvfb = new Xvfb({
-    silent: true,
-    xvfb_args: ["-screen", "0", "1366x768x24", "-ac"],
-  });
+	const xvfb = new Xvfb({
+		silent: true,
+		xvfb_args: ['-screen', '0', '1366x768x24', '-ac'],
+	});
 
-  var args = [];
+	var args = [];
 
-  args.push(`--no-sandbox`);
-  args.push(`--disable-setuid-sandbox`);
-  args.push(`--window-size=1366x768`);
-  args.push(`--blink-settings=imagesEnabled=true`);
-  args.push(`--disable-translate`);
-  args.push(`--window-position=0,0`);
-  args.push("--hide-scrollbars");
-  args.push("--mute-audio");
-  args.push(`--disable-speech-api`);
-  args.push(`--user-agent=${userAgent}`);
-  args.push(`--disable-web-security`);
+	args.push(`--no-sandbox`);
+	args.push(`--disable-setuid-sandbox`);
+	args.push(`--window-size=1366x768`);
+	args.push(`--blink-settings=imagesEnabled=true`);
+	args.push(`--disable-translate`);
+	args.push(`--window-position=0,0`);
+	args.push('--hide-scrollbars');
+	args.push('--mute-audio');
+	args.push(`--disable-speech-api`);
+	args.push(`--user-agent=${userAgent}`);
+	args.push(`--disable-web-security`);
 
-  if (!data.isHeadless) {
-    await xvfb.startSync();
-    args.push("--use-fake-device-for-media-stream");
-    args.push("--display=" + xvfb._display);
-  }
+	if (!data.isHeadless) {
+		await xvfb.startSync();
+		args.push('--use-fake-device-for-media-stream');
+		args.push('--display=' + xvfb._display);
+	}
 
-  /* Initialize Browser */
-  try {
-    // Enable stealth plugin
-    if (!data.isHeadless) {
-      puppeteer.use(
-        stealth({
-          enabledEvasions: new Set([
-            /* evasions for headless only
+	/* Initialize Browser */
+	try {
+		// Enable stealth plugin
+		if (!data.isHeadless) {
+			puppeteer.use(
+				stealth({
+					enabledEvasions: new Set([
+						/* evasions for headless only
       'chrome.app',
       'chrome.csi',
       'chrome.loadTimes',
@@ -109,306 +104,313 @@ async function search(req, res) {
       'navigator.plugins',
       'window.outerdimensions'
       */
-            //launch args (the webdriver fix is very much needed depending on how you launch chrome, just the method changed in v89) and sourceurl
-            "defaultArgs",
-            // appears to be necessary to prevent iframe issues? https://github.com/puppeteer/puppeteer/issues/1106
-            "iframe.contentWindow",
-            // necessary if running chromium instad of chrome
-            "media.codecs",
-            // Doesn't appear to be necessary with chrome version > 89?
-            "navigator.webdriver",
-            // Strips puppeteer/CDP artifacts from stacktrace
-            "sourceurl",
-            /* thou shall not lie about thou hardware stack
+						//launch args (the webdriver fix is very much needed depending on how you launch chrome, just the method changed in v89) and sourceurl
+						'defaultArgs',
+						// appears to be necessary to prevent iframe issues? https://github.com/puppeteer/puppeteer/issues/1106
+						'iframe.contentWindow',
+						// necessary if running chromium instad of chrome
+						'media.codecs',
+						// Doesn't appear to be necessary with chrome version > 89?
+						'navigator.webdriver',
+						// Strips puppeteer/CDP artifacts from stacktrace
+						'sourceurl',
+						/* thou shall not lie about thou hardware stack
       'user-agent-override', // better off using this plugin manually than the default MSFT UA imo
       'webgl.vendor', // Try and use common hardware instead
       */
-          ]),
-        })
-      );
-    } else {
-      stealth().enabledEvasions.delete("user-agent-override");
-      stealth().enabledEvasions.delete("webgl.vendor");
-      puppeteer.use(stealth());
-    }
+					]),
+				})
+			);
+		} else {
+			stealth().enabledEvasions.delete('user-agent-override');
+			stealth().enabledEvasions.delete('webgl.vendor');
+			puppeteer.use(stealth());
+		}
 
-    /* Launch Browser */
-    browser = await puppeteer.launch({
-      headless: data.isHeadless ? "new" : false,
-      executablePath: "/usr/bin/chromium-browser",
-      args: args,
-      slowMo: 0,
-    });
+		/* Launch Browser */
+		browser = await puppeteer.launch({
+			headless: data.isHeadless ? 'new' : false,
+			executablePath: '/usr/bin/chromium-browser',
+			args: args,
+			slowMo: 0,
+		});
 
-    // First page
-    const page = (await browser.pages())[0];
+		// First page
+		const page = (await browser.pages())[0];
 
-    // User agent override
-    await require("puppeteer-extra-plugin-stealth/evasions/user-agent-override")(
-      { userAgent: userAgent, locale: "en-US,en", maskLinux: true }
-    ).onPageCreated(page);
-    //await require(`puppeteer-extra-plugin-stealth/evasions/navigator.hardwareConcurrency`)(8).onPageCreated(page)
-    //await require(`puppeteer-extra-plugin-stealth/evasions/navigator.vendor`)({ vendor: 'Google Inc.' }).onPageCreated(page)
+		// User agent override
+		await require('puppeteer-extra-plugin-stealth/evasions/user-agent-override')({
+			userAgent: userAgent,
+			locale: 'en-US,en',
+			maskLinux: true,
+		}).onPageCreated(page);
+		//await require(`puppeteer-extra-plugin-stealth/evasions/navigator.hardwareConcurrency`)(8).onPageCreated(page)
+		//await require(`puppeteer-extra-plugin-stealth/evasions/navigator.vendor`)({ vendor: 'Google Inc.' }).onPageCreated(page)
 
-    // WebGL Vendor override
-    await require(`puppeteer-extra-plugin-stealth/evasions/webgl.vendor`)({
-      vendor: "Google Inc. (Intel)",
-      renderer:
-        "Intel, Intel(R) HD Graphics 4000 Direct3D11 vs_5_0 ps_5_0, D3D11",
-    }).onPageCreated(page);
+		// WebGL Vendor override
+		await require(`puppeteer-extra-plugin-stealth/evasions/webgl.vendor`)({
+			vendor: 'Google Inc. (Intel)',
+			renderer: 'Intel, Intel(R) HD Graphics 4000 Direct3D11 vs_5_0 ps_5_0, D3D11',
+		}).onPageCreated(page);
 
-    //await require(`puppeteer-extra-plugin-stealth/evasions/navigator.languages`)(['en-US', 'en']).onPageCreated(page)
+		//await require(`puppeteer-extra-plugin-stealth/evasions/navigator.languages`)(['en-US', 'en']).onPageCreated(page)
 
-    // Randomize proxy
-    function randomProxy(data) {
-      if (data.debug) console.log(proxy);
-      return data.proxies[Math.floor(Math.random() * data.proxies.length)];
-    }
+		// Randomize proxy
+		var proxies = data.proxies[Math.floor(Math.random() * data.proxies.length)];
+		if (data.debug && proxies) {
+			console.log(proxies);
+			// Use Proxy
+			await useProxy(page, proxies);
+		}
 
-    // Use Proxy
-    await useProxy(page, randomProxy(data));
+		//Randomize viewport size
+		await page.setViewport({
+			width: 1366 + Math.floor(Math.random() * 100),
+			height: 768 + Math.floor(Math.random() * 100),
+			deviceScaleFactor: 1,
+			hasTouch: false,
+			isLandscape: false,
+			isMobile: false,
+		});
 
-    //Randomize viewport size
-    await page.setViewport({
-      width: 1366 + Math.floor(Math.random() * 100),
-      height: 768 + Math.floor(Math.random() * 100),
-      deviceScaleFactor: 1,
-      hasTouch: false,
-      isLandscape: false,
-      isMobile: false,
-    });
+		await page.setJavaScriptEnabled(true);
+		await page.setDefaultNavigationTimeout(0);
 
-    await page.setJavaScriptEnabled(true);
-    await page.setDefaultNavigationTimeout(0);
+		//await page.setUserAgent(userAgent);
 
-    //await page.setUserAgent(userAgent);
+		// Saved cookies reading
+		const cookies = fs.readFileSync('cookies.json', 'utf8');
 
-    // Saved cookies reading
-    const cookies = fs.readFileSync("cookies.json", "utf8");
+		const deserializedCookies = JSON.parse(cookies);
+		await page.setCookie(...deserializedCookies);
 
-    const deserializedCookies = JSON.parse(cookies);
-    await page.setCookie(...deserializedCookies);
+		//await page.emulateTimezone('Asia/Baghdad');
 
-    //await page.emulateTimezone('Asia/Baghdad');
+		await page.setRequestInterception(true);
 
-    await page.setRequestInterception(true);
-    //Block unnecessary resource types and urls
-    await blockResources(page, data);
+		//Block unnecessary resource types and urls
+		await blockResources(page, data);
 
-    //console.log(await page.browser().userAgent())
-    // await bypassWebgl(page,userAgent,"Intel Inc.")
-    // Bypass detections
-    // await bypass(page)
-    const response = await page.goto(req.body.Url, {
-      waitUntil: data.waitUntil,
-      timeout: 0,
-    });
-    //if (data.debug) console.log(await response.headers())
-    await page.mouse.move(100, Math.floor(Math.random() * 100));
-    await page.mouse.move(200, Math.floor(Math.random() * 100));
+		//console.log(await page.browser().userAgent())
+		// await bypassWebgl(page,userAgent,"Intel Inc.")
+		// Bypass detections
+		// await bypass(page)
 
-    const saveCookies = await page.cookies();
-    await fs.promises.writeFile(
-      "./cookies.json",
-      JSON.stringify(saveCookies, null, 2)
-    );
+		// Go to page
+		await page.goto(req.body.handle, {
+			waitUntil: data.waitUntil,
+			timeout: 0,
+		});
 
-    if (data.scrollToBottom)
-      await page.evaluate(scrollToBottom, { frequency: 200, timing: 0 });
+		// Print response headers while debugging
+		// if (data.debug) console.log(await response.headers());
 
-    if (data.debug) await delay(8000);
+		// Randomly mouse movement to bypass detections
+		await page.mouse.move(100, Math.floor(Math.random() * 100));
+		await page.mouse.move(200, Math.floor(Math.random() * 100));
 
-    // debug
-    if (data.debug) {
-      // fs.writeFileSync('debug/docs/' + store + '.html', await page.evaluate(() => {
-      //   return document.querySelectorAll("html")[0].outerHTML
-      // }), {
-      //   encoding: 'utf8',
-      //   flag: 'w'
-      // })
+		// Save cookies
+		const saveCookies = await page.cookies();
+		await fs.promises.writeFile('./cookies.json', JSON.stringify(saveCookies, null, 2));
 
-      // console.log(await page.evaluate(() => {
-      //   var arr = []
-      //   arr.push(navigator.webdriver)
-      //   arr.push(navigator.language)
-      //   arr.push(navigator.deviceMemory)
-      //   arr.push(navigator.hardwareConcurrency)
-      //   arr.push(navigator.platform)
-      //   arr.push(window.screen.width)
-      //   arr.push(window.screen.height)
-      //   return arr
-      // }))
+		// Scroll to bottom
+		if (data.scrollToBottom) await page.evaluate(scrollToBottom, { frequency: 200, timing: 0 });
 
-      await page.screenshot({
-        path: "debug/screenshoots/" + store + ".png",
-        fullPage: true,
-      });
-    }
+		if (data.debug) await delay(8000);
 
-    await page.waitForSelector(data.container, {
-      timeout: 30000,
-    });
+		// debug
+		if (data.debug) {
+			// fs.writeFileSync('debug/docs/' + store + '.html', await page.evaluate(() => {
+			//   return document.querySelectorAll("html")[0].outerHTML
+			// }), {
+			//   encoding: 'utf8',
+			//   flag: 'w'
+			// })
 
-    // /* Load Page Content */
-    // var $ = cheerio.load(await page.content());
+			// console.log(await page.evaluate(() => {
+			//   var arr = []
+			//   arr.push(navigator.webdriver)
+			//   arr.push(navigator.language)
+			//   arr.push(navigator.deviceMemory)
+			//   arr.push(navigator.hardwareConcurrency)
+			//   arr.push(navigator.platform)
+			//   arr.push(window.screen.width)
+			//   arr.push(window.screen.height)
+			//   return arr
+			// }))
 
-    /* Check Product Sizes */
-    // let Size = req.body.Size;
+			await page.screenshot({
+				path: 'debug/screenshoots/' + store + '.png',
+				fullPage: true,
+			});
+		}
 
-    // if (Size) { // Size is optional
+		// Wait for Response
+		// we need to use waitForResponse because we are dealing with AJAX - no page navigation
+		//await page.waitForResponse((response) => response.status() === 200);
 
-    //   // Not Instock sizes
-    //   let requiredSize = Size.toString();
-    //   var NotInStockSizes = await elementSelector(page, data.notInStockSizes.selector, data.notInStockSizes.attribute || null, data.notInStockSizes.regex || null, data.notInStockSizes.groups || [], true)
-    //   var isOutStock
-    //   if (data.debug) console.log(NotInStockSizes)
-    //   NotInStockSizes.forEach(item => { if (item.trim() === requiredSize.trim()) isOutStock = true })
-    //   if (isOutStock) {
-    //     return res.status(500).json({
-    //       responseCode: 500,
-    //       Data: {},
-    //       Message: `Size ${Size} is Out Of Stock!`
-    //     });
-    //   }
+		// Wait for Selector
+		if (data.container) {
+			// Correct the method to 'startsWith'
+			if (data.container.startsWith('//') || data.container.startsWith('(//') || data.container.startsWith('((//')) {
+				await page.waitForXPath(data.container, {
+					timeout: 30000,
+				});
+			} else {
+				await page.waitForSelector(data.container, {
+					timeout: 30000,
+				});
+			}
+		} else {
+			throw new Error('Container is empty, please check your selector');
+		}
 
-    // InStock Sizes
-    var InStockSizes = await elementSelector(
-      page,
-      data.inStockSizes.selector,
-      data.inStockSizes.attribute || null,
-      data.inStockSizes.regex || null,
-      data.inStockSizes.groups || [],
-      true
-    );
-    // var isInstock
-    //   InStockSizes.forEach(item => { if (item.trim() === requiredSize.trim()) isInstock = true })
-    //   if (data.debug) console.log(InStockSizes)
-    //   if (!isInstock) {
-    //     return res.status(500).json({
-    //       responseCode: 500,
-    //       Data: {},
-    //       Message: `Size ${Size} is not available!`
-    //     });
-    //   }
+		// /* Load Page Content */
+		// var $ = cheerio.load(await page.content());
 
-    //   // Click Size to appear the true price
-    //   if (isInstock) {
-    //     if (data.clickSize) {
-    //       await elementClick(page,
-    //         data.clickSize.replace("{{size}}", Size.trim())
-    //       );
-    //       await delay(2000);
-    //     }
-    //   }
-    // }
+		/* Check Product Sizes */
+		// let Size = req.body.Size;
 
-    // /* Load Page Content */
-    // var $ = cheerio.load(await page.content()); //it changes to jquery
+		// if (Size) { // Size is optional
 
-    response.Url = req.body.Url;
+		//   // Not Instock sizes
+		//   let requiredSize = Size.toString();
+		//   var NotInStockSizes = await elementSelector(page, data.notInStockSizes.selectors, data.notInStockSizes.attribute || null, data.notInStockSizes.regex || null, data.notInStockSizes.groups || [], true)
+		//   var isOutStock
+		//   if (data.debug) console.log(NotInStockSizes)
+		//   NotInStockSizes.forEach(item => { if (item.trim() === requiredSize.trim()) isOutStock = true })
+		//   if (isOutStock) {
+		//     return res.status(500).json({
+		//       Data: {},
+		//       Message: `Size ${Size} is Out Of Stock!`
+		//     });
+		//   }
 
-    response.name =
-      (await elementSelector(
-        page,
-        data.title.selector || null,
-        data.title.attribute || null,
-        data.title.regex || null,
-        data.title.groups || [],
-        false
-      )) || "";
-    var strCategory =
-      (await elementSelector(
-        page,
-        data.category.selector || null,
-        data.category.attribute || null,
-        data.category.regex || null,
-        data.category.groups || [],
-        true
-      )) || "";
-    response.Category = strCategory.join(" ").trim();
-    var strPrice =
-      (await elementSelector(
-        page,
-        data.price.selector,
-        data.price.attribute || null,
-        data.price.regex || null,
-        data.price.groups || [],
-        false
-      )) || "";
-    //Extract clean price without decimal
-    if (strPrice.includes(",") || strPrice.includes(".")) {
-      strPrice = strPrice.match(/[,.\d]+(?=[.,]\d+)/g)[0];
-      strPrice = strPrice.replace(/[.,]/g, "");
-    } else {
-      console.log("price is >" + strPrice);
-      strPrice = strPrice.match(/\d+/g);
-      strPrice = strPrice[0];
-    }
+		// InStock Sizes
+		// var InStockSizes = await elementSelector(
+		// 	page,
+		// 	data.inStockSizes.selectors,
+		// 	data.inStockSizes.attribute || null,
+		// 	data.inStockSizes.regex || null,
+		// 	data.inStockSizes.groups || [],
+		// 	true
+		// );
+		// var isInstock
+		//   InStockSizes.forEach(item => { if (item.trim() === requiredSize.trim()) isInstock = true })
+		//   if (data.debug) console.log(InStockSizes)
+		//   if (!isInstock) {
+		//     return res.status(500).json({
+		//       Data: {},
+		//       Message: `Size ${Size} is not available!`
+		//     });
+		//   }
 
-    response.price = strPrice;
-    response.color =
-      (await elementSelector(
-        page,
-        data.color.selector || null,
-        data.color.attribute || null,
-        data.color.regex || null,
-        data.color.groups || [],
-        false
-      )) || "";
-    //response.size = Size;
+		//   // Click Size to appear the true price
+		//   if (isInstock) {
+		//     if (data.clickSize) {
+		//       await elementClick(page,
+		//         data.clickSize.replace("{{size}}", Size.trim())
+		//       );
+		//       await delay(2000);
+		//     }
+		//   }
+		// }
 
-    //  if(!response.Price){
-    //    response.Price = $('div#productInfo > div#rightInfoBar > div.info-panel:nth-child(1) > div.main-info-area > div:nth-child(3) > div.price-area > div > div > span.advanced-price').text().replace(/\n/g, "").trim() || "";
-    //  }
-    //  if(response.Price){
-    //      response.Price = (response.Price).replace(/\D/g, ''); // Extract Number's from String
-    //  }
+		// /* Load Page Content */
+		// var $ = cheerio.load(await page.content()); //it changes to jquery
+		const response = {};
 
-    /* See All Images */
-    var strImages = await elementSelector(
-      page,
-      data.images.selector,
-      data.images.attribute || null,
-      data.images.regex || null,
-      data.images.groups || [],
-      true
-    );
+		response.handle = req.body.handle;
 
-    for (let index = 0; index < strImages.length; index++) {
-      if (strImages[index]) {
-        if (!strImages[index].startsWith("https://")) {
-          if (strImages[index].startsWith("//")) {
-            strImages[index] = "https:" + strImages[index];
-          } else {
-            strImages[index] = "https://" + strImages[index];
-          }
-        }
-      }
-    }
+		response.title = (
+			await elementSelector(
+				page,
+				data.title.selectors || null,
+				data.title.attribute || null,
+				data.title.regex || null,
+				data.title.groups || [],
+				true,
+				data.title.valueToReplace || []
+			)
+		).join(' ');
 
-    response.Images = await strImages;
+		response.descriptions =
+			(
+				await elementSelector(
+					page,
+					data.descriptions.selectors || null,
+					data.descriptions.attribute || null,
+					data.descriptions.regex || null,
+					data.descriptions.groups || [],
+					true,
+					data.descriptions.valueToReplace || []
+				)
+			).join(' ') || '';
 
-    console.log("\x1b[32m%s\x1b[0m", url);
-    return res.status(200).json({
-      responseCode: 200,
-      Data: response,
-      Message: "Success.",
-    });
-  } catch (e) {
-    console.log("err", e);
-    //console.log(userAgent)
-    console.log("\x1b[31m%s\x1b[0m", url);
-    return res.status(500).json({
-      responseCode: 500,
-      Data: {},
-      Message: "Some error occured Or data not found, please try again.",
-    });
-  } finally {
-    if (!data.isHeadless) {
-      xvfb.stopSync();
-    }
-    browser.close();
-  }
+		response.vendor =
+			data.vendor.name ||
+			(
+				await elementSelector(
+					page,
+					data.vendor,
+					data.vendor.attribute || null,
+					data.vendor.regex || null,
+					data.vendor.groups || [],
+					true,
+					data.vendor.valueToReplace || []
+				)
+			).join(' ') ||
+			'';
+
+		response.category =
+			(
+				await elementSelector(
+					page,
+					data.category.selectors || null,
+					data.category.attribute || null,
+					data.category.regex || null,
+					data.category.groups || [],
+					true,
+					data.category.valueToReplace || []
+				)
+			)
+				.join(' ')
+				.trim() || '';
+
+		response.variants = data.option3.selectors.length
+			? await GetOption3AndOption2AndOption1(page, data)
+			: null || data.option2.selectors.length
+			? await GetOption2AndOption1(page, data, null, null, null, null)
+			: null || data.option1.selectors.length
+			? await GetOption1(page, data, null, null, null, null, null, null, null)
+			: null || [];
+
+		response.message = 'success';
+		console.log('\x1b[32m%s\x1b[0m', 'Succeed response'); //green
+
+		return res.status(200).json(response);
+	} catch (e) {
+		console.log('\x1b[31m%s\x1b[0m', e.message);
+		if (e.message.includes('Waiting failed')) {
+			return res.status(500).json({
+				message: e.message,
+			});
+		} else if (e.message.includes('Timeout exceeded while waiting for event')) {
+			return res.status(500).json({
+				message: e.message,
+			});
+		} else {
+			console.log('err', e);
+			return res.status(500).json({
+				message: 'Some error occured Or data not found, please try again.',
+			});
+		}
+	} finally {
+		if (!data.isHeadless) {
+			xvfb.stopSync();
+		}
+		browser.close();
+	}
 }
 
 module.exports = storesController;

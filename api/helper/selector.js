@@ -1,150 +1,97 @@
 async function mainSelector(page, selector, attribute) {
-  if (selector.startsWith("//") || selector.startsWith("(//")) {
-    if (attribute) {
-      return await page.evaluate(
-        async ({ selector, attribute }) => {
-          return Array.from(
-            (function () {
-              var arr = [];
-              var results = document.evaluate(
-                selector,
-                document,
-                null,
-                XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-                null
-              );
-              while ((node = results.iterateNext())) {
-                arr.push(node);
-              }
-              return arr;
-            })()
-          ).map((el) =>
-            el
-              .getAttribute(attribute)
-              .replace(/&lt;/g, "<")
-              .replace(/&gt;/g, ">")
-              .replace(/&quot;/g, '"')
-              .replace(/&39;/g, "'")
-              .replace(/&amp;/g, "&")
-              .replace(/\n/g, "")
-              .trim()
-          );
-        },
-        { selector, attribute }
-      );
-    } else {
-      return await page.evaluate(async (selector) => {
-        return Array.from(
-          (function () {
-            var arr = [];
-            var results = document.evaluate(
-              selector,
-              document,
-              null,
-              XPathResult.ORDERED_NODE_ITERATOR_TYPE,
-              null
-            );
-            while ((node = results.iterateNext())) {
-              arr.push(node);
-            }
-            return arr;
-          })()
-        ).map((el) =>
-          el.textContent
-            .replace(/(\r\n|\n|\r)/gm, "")
-            .replace(/&lt;/g, "<")
-            .replace(/&gt;/g, ">")
-            .replace(/&quot;/g, '"')
-            .replace(/&39;/g, "'")
-            .replace(/&amp;/g, "&")
-            .replace(/\n/g, "")
-            .trim()
-        );
-      }, selector);
-    }
-  } else {
-    if (attribute) {
-      return await page.evaluate(
-        ({ selector, attribute }) => {
-          return Array.from(document.querySelectorAll(selector)).map((el) =>
-            el
-              .getAttribute(attribute)
-              .replace(/&lt;/g, "<")
-              .replace(/&gt;/g, ">")
-              .replace(/&quot;/g, '"')
-              .replace(/&39;/g, "'")
-              .replace(/&amp;/g, "&")
-              .replace(/\n/g, "")
-              .trim()
-          );
-        },
-        { selector, attribute }
-      );
-    } else {
-      return await page.evaluate((selector) => {
-        return Array.from(document.querySelectorAll(selector)).map((el) =>
-          el.textContent
-            .replace(/(\r\n|\n|\r)/gm, "")
-            .replace(/&lt;/g, "<")
-            .replace(/&gt;/g, ">")
-            .replace(/&quot;/g, '"')
-            .replace(/&39;/g, "'")
-            .replace(/&amp;/g, "&")
-            .replace(/\n/g, "")
-            .trim()
-        );
-      }, selector);
-    }
-  }
+	// Determine if the selector is an XPath selector
+	const isXPathSelector = selector.startsWith('//') || selector.startsWith('(//') || selector.startsWith('((//');
+
+	try {
+		// Evaluate the content within the page context
+		return await page.evaluate(
+			({ selector, attribute, isXPathSelector }) => {
+				// This function needs to be re-declared inside evaluate because page.evaluate is in the browser context
+				const extractContent = (elements, attr) =>
+					elements.map((el) =>
+						(attr ? el.getAttribute(attr) : el.textContent)
+							.replace(/&lt;/g, '<')
+							.replace(/&gt;/g, '>')
+							.replace(/&quot;/g, '"')
+							.replace(/&39;/g, "'")
+							.replace(/&amp;/g, '&')
+							.replace(/\n/g, '')
+							.trim()
+					);
+
+				// Collect elements based on selector type
+				const elements = isXPathSelector
+					? document.evaluate(selector, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null)
+					: document.querySelectorAll(selector);
+
+				// Convert elements to array for XPath or use directly for querySelectorAll
+				const nodes = isXPathSelector
+					? Array.from({ length: elements.snapshotLength }, (_, index) => elements.snapshotItem(index))
+					: Array.from(elements);
+
+				return extractContent(nodes, attribute);
+			},
+			{ selector, attribute, isXPathSelector }
+		);
+	} catch (error) {
+		console.error('Error in mainSelector:', error);
+		return []; // Return an empty array if there's an error
+	}
 }
 
-async function elementSelector(
-  page,
-  selector,
-  attribute,
-  regex,
-  groups,
-  queryAll
-) {
-  if (!queryAll) {
-    if (regex) {
-      if (groups.length > 0) {
-        // if we have groups
-        var arr = [];
-        const tmpSelector = await mainSelector(page, selector, attribute);
-        for (let index = 0; index < groups.length; index++) {
-          arr.push(tmpSelector[0].match(regex)[groups[index]]);
-        }
-        return arr.join("");
-      } else {
-        //if we have only regex
-        const tmpSelector = await mainSelector(page, selector, attribute);
-        var regx = tmpSelector[0].match(regex);
-        return regx.join("");
-      }
-    } else {
-      const tmpSelector = await mainSelector(page, selector, attribute);
-      return tmpSelector[0]; //return the first array
-    }
-  } else {
-    if (regex) {
-      // if we have groups
-      if (groups.length > 0)
-        return Array.from(await mainSelector(page, selector, attribute)).map(
-          (item) =>
-            Array.from(groups)
-              .map((group) => item.match(new RegExp(regex, "gi"))[group])
-              .join("")
-        );
-      //if we have only regex
-      else
-        return Array.from(await mainSelector(page, selector, attribute)).map(
-          (item) => item.match(new RegExp(regex, "gi")).join("")
-        );
-    } else {
-      return await mainSelector(page, selector, attribute);
-    }
-  }
+async function elementSelector(page, selectors, attribute, regex, groups, queryAll, valueToReplace) {
+	if (!Array.isArray(selectors)) {
+		throw new Error('selectors must be an array');
+	}
+	if (valueToReplace && !Array.isArray(valueToReplace)) {
+		throw new Error('valueToReplace must be an array of replacement rules');
+	}
+	let arrSelector = [];
+
+	const applyRegexAndGroups = async (value, regex, groups) => {
+		const matches = value.match(new RegExp(regex, 'gi'));
+		if (!matches) return '';
+		if (groups && groups.length > 0) {
+			return groups.map((group) => matches[group]).join('');
+		} else {
+			return matches.join('');
+		}
+	};
+
+	const replaceValues = async (value, replacements) => {
+		replacements.forEach((replacement) => {
+			if (replacement.value) {
+				value = value.replace(new RegExp(replacement.value, 'gi'), replacement.replaceWith);
+			}
+		});
+		return value.trim();
+	};
+
+	for (const selector of selectors) {
+		let elements;
+
+		elements = (await mainSelector(page, selector, attribute, queryAll)) || [];
+
+		if (elements.length === 0) {
+			console.log('\x1b[33m%s\x1b[0m', `Error selecting elements with selector "${selector}"`);
+			continue; // Skip to the next selector if no elements are found
+		}
+		elements.forEach((elementValue) => {
+			let value = regex ? applyRegexAndGroups(elementValue, regex, groups) : elementValue;
+			if (valueToReplace) {
+				value = replaceValues(value, valueToReplace);
+			}
+			if (value) arrSelector.push(value);
+		});
+
+		if (!queryAll && arrSelector.length) {
+			break;
+		}
+	}
+
+	return arrSelector;
 }
 
-module.exports = elementSelector;
+// Ensure mainSelector is defined or imported in the scope
+
+module.exports = { elementSelector };
