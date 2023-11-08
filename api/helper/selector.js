@@ -1,40 +1,43 @@
+const { delay } = require('./delay');
+
 async function mainSelector(page, selector, attribute) {
-	// Determine if the selector is an XPath selector
-	const isXPathSelector = selector.startsWith('//') || selector.startsWith('(//') || selector.startsWith('((//');
-
 	try {
-		// Evaluate the content within the page context
-		return await page.evaluate(
-			({ selector, attribute, isXPathSelector }) => {
-				// This function needs to be re-declared inside evaluate because page.evaluate is in the browser context
-				const extractContent = (elements, attr) =>
-					elements.map((el) =>
-						(attr ? el.getAttribute(attr) : el.textContent)
-							.replace(/&lt;/g, '<')
-							.replace(/&gt;/g, '>')
-							.replace(/&quot;/g, '"')
-							.replace(/&39;/g, "'")
-							.replace(/&amp;/g, '&')
-							.replace(/\n/g, '')
-							.trim()
-					);
+		// Check if the selector is an XPath selector
+		const isXPathSelector = selector.startsWith('//') || selector.startsWith('(//') || selector.startsWith('((//');
+		let elements = [];
+		if (isXPathSelector) {
+			// Use $x for XPath selectors to get element handles
+			elements = (await page.$x(selector)) || [];
+		} else {
+			// Use $$ for CSS selectors to get element handles
+			elements = (await page.$$(selector)) || [];
+		}
 
-				// Collect elements based on selector type
-				const elements = isXPathSelector
-					? document.evaluate(selector, document, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null)
-					: document.querySelectorAll(selector);
+		// Map over each element handle to extract attribute or textContent
+		const contentPromises = elements.map((el) => {
+			if (attribute) {
+				// Use evaluate to get the attribute value from the element handle
+				return el.evaluate((e, attr) => e.getAttribute(attr) || '', attribute);
+			} else {
+				// Use evaluate to get the textContent from the element handle
+				return el.evaluate((e) => e.textContent.trim());
+			}
+		});
 
-				// Convert elements to array for XPath or use directly for querySelectorAll
-				const nodes = isXPathSelector
-					? Array.from({ length: elements.snapshotLength }, (_, index) => elements.snapshotItem(index))
-					: Array.from(elements);
+		// Resolve all promises from the mapping
+		const content = await Promise.all(contentPromises);
 
-				return extractContent(nodes, attribute);
-			},
-			{ selector, attribute, isXPathSelector }
+		// Decode HTML entities
+		return content.map((text) =>
+			text
+				.replace(/&lt;/g, '<')
+				.replace(/&gt;/g, '>')
+				.replace(/&quot;/g, '"')
+				.replace(/&39;/g, "'")
+				.replace(/&amp;/g, '&')
 		);
 	} catch (error) {
-		console.error('Error in mainSelector:', error);
+		console.log('selector', selector);
 		return []; // Return an empty array if there's an error
 	}
 }
@@ -48,7 +51,7 @@ async function elementSelector(page, selectors, attribute, regex, groups, queryA
 	}
 	let arrSelector = [];
 
-	const applyRegexAndGroups = async (value, regex, groups) => {
+	const applyRegexAndGroups = (value, regex, groups) => {
 		const matches = value.match(new RegExp(regex, 'gi'));
 		if (!matches) return '';
 		if (groups && groups.length > 0) {
@@ -58,7 +61,7 @@ async function elementSelector(page, selectors, attribute, regex, groups, queryA
 		}
 	};
 
-	const replaceValues = async (value, replacements) => {
+	const replaceValues = (value, replacements) => {
 		replacements.forEach((replacement) => {
 			if (replacement.value) {
 				value = value.replace(new RegExp(replacement.value, 'gi'), replacement.replaceWith);
@@ -69,13 +72,14 @@ async function elementSelector(page, selectors, attribute, regex, groups, queryA
 
 	for (const selector of selectors) {
 		let elements;
-
-		elements = (await mainSelector(page, selector, attribute, queryAll)) || [];
+		//await delay(1000);
+		elements = await mainSelector(page, selector, attribute, queryAll);
 
 		if (elements.length === 0) {
 			console.log('\x1b[33m%s\x1b[0m', `Error selecting elements with selector "${selector}"`);
 			continue; // Skip to the next selector if no elements are found
 		}
+
 		elements.forEach((elementValue) => {
 			let value = regex ? applyRegexAndGroups(elementValue, regex, groups) : elementValue;
 			if (valueToReplace) {
@@ -88,7 +92,7 @@ async function elementSelector(page, selectors, attribute, regex, groups, queryA
 			break;
 		}
 	}
-
+	console.log('arrSelector', arrSelector);
 	return arrSelector;
 }
 

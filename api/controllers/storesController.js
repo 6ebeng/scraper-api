@@ -322,68 +322,76 @@ async function search(req, res) {
 
 		response.handle = req.body.handle;
 
-		response.title = (
-			await elementSelector(
-				page,
-				data.title.selectors || null,
-				data.title.attribute || null,
-				data.title.regex || null,
-				data.title.groups || [],
-				true,
-				data.title.valueToReplace || []
-			)
-		).join(' ');
+		const title = await elementSelector(
+			page,
+			data.title.selectors,
+			data.title.attribute,
+			data.title.regex,
+			data.title.groups,
+			true,
+			data.title.valueToReplace
+		);
+		if (Array.isArray(title)) {
+			response.title = title.join(' ');
+		} else {
+			response.title = title || '';
+		}
 
-		response.descriptions =
-			(
-				await elementSelector(
-					page,
-					data.descriptions.selectors || null,
-					data.descriptions.attribute || null,
-					data.descriptions.regex || null,
-					data.descriptions.groups || [],
-					true,
-					data.descriptions.valueToReplace || []
-				)
-			).join(' ') || '';
+		const descriptions = await elementSelector(
+			page,
+			data.descriptions.selectors,
+			data.descriptions.attribute,
+			data.descriptions.regex,
+			data.descriptions.groups,
+			true,
+			data.descriptions.valueToReplace
+		);
+		if (Array.isArray(descriptions)) {
+			response.descriptions = descriptions.join(' ');
+		} else {
+			response.descriptions = descriptions || '';
+		}
 
-		response.vendor =
+		const vendor =
 			data.vendor.name ||
-			(
-				await elementSelector(
-					page,
-					data.vendor,
-					data.vendor.attribute || null,
-					data.vendor.regex || null,
-					data.vendor.groups || [],
-					true,
-					data.vendor.valueToReplace || []
-				)
-			).join(' ') ||
-			'';
+			(await elementSelector(
+				page,
+				data.vendor,
+				data.vendor.attribute,
+				data.vendor.regex,
+				data.vendor.groups,
+				true,
+				data.vendor.valueToReplace
+			));
+		if (Array.isArray(vendor)) {
+			response.vendor = vendor.join(' ');
+		} else {
+			response.vendor = vendor || '';
+		}
 
-		response.category =
-			(
-				await elementSelector(
-					page,
-					data.category.selectors || null,
-					data.category.attribute || null,
-					data.category.regex || null,
-					data.category.groups || [],
-					true,
-					data.category.valueToReplace || []
-				)
-			)
-				.join(' ')
-				.trim() || '';
+		const category = await elementSelector(
+			page,
+			data.category.selectors,
+			data.category.attribute,
+			data.category.regex,
+			data.category.groups,
+			true,
+			data.category.valueToReplace
+		);
+		if (Array.isArray(category)) {
+			response.category = category.join(' ');
+		} else {
+			response.category = category.trim() || '';
+		}
 
-		response.variants = data.option3.selectors.length
-			? await GetOption3AndOption2AndOption1(page, data)
-			: null || data.option2.selectors.length
-			? await GetOption2AndOption1(page, data, null, null, null, null)
-			: null || data.option1.selectors.length
-			? await GetOption1(page, data, null, null, null, null, null, null, null)
-			: null || [];
+		// if (data.option3.selectors.length) {
+		// 	response.variants = await GetOption3AndOption2AndOption1(page, data);
+		// } else if (data.option2.selectors.length) {
+		// 	response.variants = await GetOption2AndOption1(page, data, null, null, null, []);
+		// } else {
+		// }
+
+		response.variants = await GetOption1(page, data, null, null, null, null, null, null, []);
 
 		response.message = 'success';
 		console.log('\x1b[32m%s\x1b[0m', 'Succeed response'); //green

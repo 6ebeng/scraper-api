@@ -60,7 +60,8 @@
 	"price": {
 		"selectors": [
 			"//div[@class='product-features-prices']/span/div/span[@data-testid='currentPrice']/span/span",
-			"//div[@class='product-features-prices']/div/div/span[@data-testid='currentPrice']/span/span"
+			"//div[@class='product-features-prices']/div/div/span[@data-testid='currentPrice']/span/span",
+			"//div[@class='product-features-prices']/div/div/*/span[@data-testid='currentPrice']/span/span"
 		],
 		"attribute": "",
 		"regex": "",
@@ -79,7 +80,7 @@
 		"groups": [],
 		"valueToReplace": [
 			{
-				"value": "",
+				"value": "REF. ",
 				"replaceWith": ""
 			}
 		]
@@ -97,7 +98,7 @@
 		]
 	},
 	"OutOfStockSTDIndicator": {
-		"selectors": ["div.sizes > span:not([class*='not-avaliable']):not([class*='size-unavailable'])"]
+		"selectors": ["div.sizes > span:not([class*='not-available']):not([class*='size-unavailable'])"]
 	},
 	"option1": {
 		"option1Name": "size",
@@ -185,7 +186,7 @@
 		]
 	},
 	"imageSrc": {
-		"selectors": ["img.zoom-thumbnail[alt]"],
+		"selectors": ["img.image-js[alt]"],
 		"attribute": "src",
 		"regex": "",
 		"groups": [],

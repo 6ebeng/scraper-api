@@ -3,32 +3,35 @@ const { cleanPrice } = require('./cleanPrice');
 const { elementClick } = require('./click');
 
 // Resolve images url
-async function fixImage(imageUrls) {
+function fixImage(imageUrls) {
 	imageUrls.forEach((imageUrl, index) => {
-		if (imageUrl[index]) {
-			if (!imageUrl[index].startsWith('https://')) {
-				if (imageUrl[index].startsWith('//')) {
-					imageUrl[index] = 'https:' + imageUrl[index];
+		if (imageUrl) {
+			if (!imageUrl.startsWith('https://')) {
+				if (imageUrl.startsWith('//')) {
+					imageUrls[index] = 'https:' + imageUrl;
 				} else {
-					imageUrl[index] = 'https://' + imageUrl[index];
+					imageUrls[index] = 'https://' + imageUrl;
 				}
 			}
 		}
 	});
+	return imageUrls;
 }
 
 // Get Clean price
 async function GetCleanPrice(page, data) {
 	const price = cleanPrice(
-		(await elementSelector(
-			page,
-			data.price.selectors,
-			data.price.attribute || null,
-			data.price.regex || null,
-			data.price.groups || [],
-			false,
-			data.price.valueToReplace || []
-		)) || ''
+		(
+			await elementSelector(
+				page,
+				data.price.selectors,
+				data.price.attribute,
+				data.price.regex,
+				data.price.groups,
+				false,
+				data.price.valueToReplace
+			)
+		)[0] || ''
 	);
 
 	// if price not a number and empty
@@ -55,66 +58,69 @@ async function GetOption1(
 	arrayOptions = []
 ) {
 	// Default values
-	const price = '';
-	const sku = '';
-	const option1Values = [];
-	let OutOfStockSTDIndicator = [];
-	const variantHandle = '';
+	var arrayOption1 = arrayOptions;
+	var price = '';
+	var sku = '';
+	var option1Values = [];
+	var OutOfStockSTDIndicator = [];
+	var quantity = 0;
+	var options = [];
+	var variantHandle = '';
 
-	if (data.OutOfStockSTDIndicator.selectors.length > 0) {
-		OutOfStockSTDIndicator =
-			(await elementSelector(page, data.OutOfStockSTDIndicator.selectors, null, null, null, true, null)) || [];
-	}
+	// if (data.OutOfStockSTDIndicator.selectors.length > 0) {
+	// 	OutOfStockSTDIndicator =
+	// 		(await elementSelector(page, data.OutOfStockSTDIndicator.selectors, null, null, null, true, null)) || [];
+	// }
 
-	console.log('OutOfStockSTDIndicator', OutOfStockSTDIndicator);
-	if (OutOfStockSTDIndicator.length === 0) {
+	if (!OutOfStockSTDIndicator.length) {
+		console.log('hello');
 		// Option 1 values
 		option1Values = (await elementSelector(
 			page,
 			data.option1.selectors,
-			data.option1.attribute || null,
-			data.option1.regex || null,
-			data.option1.groups || [],
+			data.option1.attribute,
+			data.option1.regex,
+			data.option1.groups,
 			true,
 			data.option1.valueToReplace || []
 		)) || ['STD'];
 	}
-	if (data.clickImage.selector.length) {
-		// Click on image
-		await elementClick(page, data.clickImage.selector, '', 0);
-	}
+	// if (data.clickImage.selector.length) {
+	// 	// Click on image
+	// 	await elementClick(page, data.clickImage.selector, '', 0);
+	// }
 
 	// Image srcs
-	const imageSrcs = await elementSelector(
-		page,
-		data.imageSrc.selectors,
-		data.imageSrc.attribute || null,
-		data.imageSrc.regex || null,
-		data.imageSrc.groups || [],
-		true,
-		data.imageSrc.valueToReplace || []
+	const imageSrcs = fixImage(
+		await elementSelector(
+			page,
+			data.imageSrc.selectors,
+			data.imageSrc.attribute,
+			data.imageSrc.regex,
+			data.imageSrc.groups,
+			true,
+			data.imageSrc.valueToReplace
+		)
 	);
 
 	// if imageSrcs is empty
-	if (!imageSrcs.length)
-		throw (
-			(new Error('Images are empty, please check your selector'),
-			console.log('\x1b[31m%s\x1b[0m', 'Images are empty, please check your selector'))
-		);
+	if (imageSrcs.length === 0) throw new Error('Images are empty, please check your selector');
 
 	if (!data.clickOption1.selector.length) {
-		sku = await elementSelector(
-			page,
-			data.sku.selectors,
-			data.sku.attribute || null,
-			data.sku.regex || null,
-			data.sku.groups || [],
-			false,
-			data.sku.valueToReplace || []
-		);
+		sku = (
+			await elementSelector(
+				page,
+				data.sku.selectors,
+				data.sku.attribute,
+				data.sku.regex,
+				data.sku.groups,
+				false,
+				data.sku.valueToReplace
+			)
+		)[0];
 
 		// Get price
-		price = GetCleanPrice(page, data);
+		price = await GetCleanPrice(page, data);
 
 		// Get url after click
 		variantHandle = page.url();
@@ -125,47 +131,41 @@ async function GetOption1(
 	 **************************************************/
 
 	for (let index = 0; index < option1Values.length || index < imageSrcs.length; index++) {
-		// Default values
-		const price = '';
-		const sku = '';
-		const quantity = '';
-		const options = [];
-
 		// Check if clickOption1 is set
-		if (data.clickOption1.selector.length) {
-			// Click on option 1
-			await elementClick(page, data.clickOption1.selector, option1Values[index], 0);
+		// if (data.clickOption1.selector.length) {
+		// 	// Click on option 1
+		// 	await elementClick(page, data.clickOption1.selector, option1Values[index], 0);
 
-			// Get url after click
-			variantHandle = page.url();
+		// 	// Get url after click
+		// 	variantHandle = page.url();
 
-			// Get price
-			price = await GetCleanPrice(page, data);
+		// 	// Get price
+		// 	price = await GetCleanPrice(page, data);
 
-			sku = await elementSelector(
-				page,
-				data.sku.selectors,
-				data.sku.attribute || null,
-				data.sku.regex || null,
-				data.sku.groups || [],
-				false,
-				data.sku.valueToReplace || []
-			);
-		}
+		// 	sku = await elementSelector(
+		// 		page,
+		// 		data.sku.selectors,
+		// 		data.sku.attribute || null,
+		// 		data.sku.regex || null,
+		// 		data.sku.groups || [],
+		// 		false,
+		// 		data.sku.valueToReplace || []
+		// 	);
+		// }
 
 		// options array to return
 		if (option3Id && option2Id) {
 			options = [
 				{
-					option1: data.option1Name,
+					option1: data.option1.option1Name,
 					value: option1Values[index] || '',
 				},
 				{
-					option2: data.option2Name,
+					option2: data.option2.option2Name,
 					value: option2Values[indexOption2Id],
 				},
 				{
-					option3: data.option3Name,
+					option3: data.option3.option3Name,
 					value: option3Values[indexOption3Id],
 				},
 			];
@@ -173,55 +173,58 @@ async function GetOption1(
 		if (option2Id) {
 			options = [
 				{
-					option1: data.option1Name,
+					option1: data.option1.option1Name,
 					value: option1Values[index] || '',
 				},
 				{
-					option2: data.option2Name,
+					option2: data.option2.option2Name,
 					value: option2Values[indexOption2Id],
 				},
 			];
 		} else {
 			options = [
 				{
-					option1: data.option1Name,
+					option1: data.option1.option1Name,
 					value: option1Values[index] || '',
 				},
 			];
 		}
 
-		if (data.quantity.selectors && option1Values[index]) {
-			quantity = await elementSelector(
-				page,
-				data.quantity.selectors,
-				data.quantity.attribute || null,
-				data.quantity.regex || null,
-				data.quantity.groups || [],
-				false
-			);
+		if (data.quantity.selectors.length && option1Values[index]) {
+			quantity = (
+				await elementSelector(
+					page,
+					data.quantity.selectors,
+					data.quantity.attribute,
+					data.quantity.regex,
+					data.quantity.groups,
+					false
+				)
+			)[0];
 		} else {
 			quantity = 5;
 		}
 
-		const imageSrc = fixImage(imageSrcs[index]) || '';
+		const imageSrc = imageSrcs[index] || '';
 
 		const option = {
-			variantId: index + 1 || '',
+			variantId: index + 1,
 			variantHandle: variantHandle || '',
 			price: price || '',
 			sku: sku || '',
 			options: options || [],
-			quantity: quantity || null,
+			quantity: quantity || 0,
 			imageSrc: imageSrc || '',
 		};
 
-		option ? arrayOptions.push(option) : arrayOptions;
+		option ? arrayOption1.push(option) : arrayOption1;
 	}
-	return arrayOptions;
+	return arrayOption1;
 }
 
 // Get option 2 and option 1
 async function GetOption2AndOption1(page, data, option3Values, option3Id, indexOption3Id, arrayOptions = []) {
+	let arrayOption2 = arrayOptions;
 	// Get option 2 values
 	const option2Values =
 		(await elementSelector(
@@ -255,7 +258,7 @@ async function GetOption2AndOption1(page, data, option3Values, option3Id, indexO
 			await elementClick(page, data.clickOption2.selector, option2Id, 0);
 		}
 
-		return await GetOption1(
+		arrayOption2 = await GetOption1(
 			page,
 			data,
 			option3Values,
@@ -264,16 +267,15 @@ async function GetOption2AndOption1(page, data, option3Values, option3Id, indexO
 			option2Values,
 			option2Id,
 			indexOption2Id,
-			arrayOptions
+			arrayOption2
 		);
 	});
-
-	return [];
+	return arrayOption2;
 }
 
 // Get option 3 and option 2 and option 1
 async function GetOption3AndOption2AndOption1(page, data) {
-	const arrayOptions = [];
+	let arrayOptions = [];
 	// Get option 3 values
 	const option3Values =
 		(await elementSelector(
@@ -305,10 +307,10 @@ async function GetOption3AndOption2AndOption1(page, data) {
 			// Click on option 3
 			await elementClick(page, data.clickOption3.selector, option3Values[indexOption3Id], 0);
 		}
-		return await GetOption2AndOption1(page, data, option3Values, option3Id, indexOption3Id, arrayOptions);
+		arrayOptions = await GetOption2AndOption1(page, data, option3Values, option3Id, indexOption3Id, arrayOptions);
 	});
 
-	return [];
+	return arrayOptions;
 }
 
 module.exports = {
