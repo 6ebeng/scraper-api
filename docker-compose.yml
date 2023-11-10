@@ -1,11 +1,11 @@
-version: "3.8"
+version: '3.8'
 name: scraper
 services:
   web:
-    image: "scraper"
-    container_name: "scraper_api"
+    image: 'scraper'
+    container_name: 'scraper_api'
     restart: always
-    build: 
+    build:
       target: production
     ports:
       - 4200:4200

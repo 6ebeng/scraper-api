@@ -57,8 +57,8 @@ async function GetOption1(
 	indexOption2Id,
 	arrayOptions = []
 ) {
+	if (data.option1.selectors.length === 0) return arrayOptions;
 	// Default values
-	var arrayOption1 = arrayOptions;
 	var price = '';
 	var sku = '';
 	var option1Values = [];
@@ -67,13 +67,12 @@ async function GetOption1(
 	var options = [];
 	var variantHandle = '';
 
-	// if (data.OutOfStockSTDIndicator.selectors.length > 0) {
-	// 	OutOfStockSTDIndicator =
-	// 		(await elementSelector(page, data.OutOfStockSTDIndicator.selectors, null, null, null, true, null)) || [];
-	// }
+	if (data.OutOfStockSTDIndicator.selectors.length > 0) {
+		OutOfStockSTDIndicator =
+			(await elementSelector(page, data.OutOfStockSTDIndicator.selectors, null, null, null, true, [])) || [];
+	}
 
-	if (!OutOfStockSTDIndicator.length) {
-		console.log('hello');
+	if (OutOfStockSTDIndicator.length === 0) {
 		// Option 1 values
 		option1Values = (await elementSelector(
 			page,
@@ -84,11 +83,13 @@ async function GetOption1(
 			true,
 			data.option1.valueToReplace || []
 		)) || ['STD'];
+	} else {
+		option1Values = ['STD'];
 	}
-	// if (data.clickImage.selector.length) {
-	// 	// Click on image
-	// 	await elementClick(page, data.clickImage.selector, '', 0);
-	// }
+
+	// Click on image
+	if (data.clickImage.selector !== '')
+		await elementClick(page, data.clickImage.selector, '', data.clickImage.delayTime);
 
 	// Image srcs
 	const imageSrcs = fixImage(
@@ -132,28 +133,31 @@ async function GetOption1(
 
 	for (let index = 0; index < option1Values.length || index < imageSrcs.length; index++) {
 		// Check if clickOption1 is set
-		// if (data.clickOption1.selector.length) {
-		// 	// Click on option 1
-		// 	await elementClick(page, data.clickOption1.selector, option1Values[index], 0);
+		if (data.clickOption1.selector.length) {
+			// Click on option 1
+			await elementClick(page, data.clickOption1.selector, option1Values[index], 0);
 
-		// 	// Get url after click
-		// 	variantHandle = page.url();
+			// Get url after click
+			variantHandle = page.url();
 
-		// 	// Get price
-		// 	price = await GetCleanPrice(page, data);
+			// Get price
+			price = await GetCleanPrice(page, data);
 
-		// 	sku = await elementSelector(
-		// 		page,
-		// 		data.sku.selectors,
-		// 		data.sku.attribute || null,
-		// 		data.sku.regex || null,
-		// 		data.sku.groups || [],
-		// 		false,
-		// 		data.sku.valueToReplace || []
-		// 	);
-		// }
+			sku = (
+				await elementSelector(
+					page,
+					data.sku.selectors,
+					data.sku.attribute,
+					data.sku.regex,
+					data.sku.groups,
+					false,
+					data.sku.valueToReplace
+				)
+			)[0];
+		}
 
 		// options array to return
+		options = [];
 		if (option3Id && option2Id) {
 			options = [
 				{
@@ -181,7 +185,7 @@ async function GetOption1(
 					value: option2Values[indexOption2Id],
 				},
 			];
-		} else {
+		} else if (option1Values[index]) {
 			options = [
 				{
 					option1: data.option1.option1Name,
@@ -217,14 +221,14 @@ async function GetOption1(
 			imageSrc: imageSrc || '',
 		};
 
-		option ? arrayOption1.push(option) : arrayOption1;
+		arrayOptions.push(option);
 	}
-	return arrayOption1;
+	return arrayOptions;
 }
 
 // Get option 2 and option 1
 async function GetOption2AndOption1(page, data, option3Values, option3Id, indexOption3Id, arrayOptions = []) {
-	let arrayOption2 = arrayOptions;
+	if (data.option2.selectors.length === 0) return arrayOptions;
 	// Get option 2 values
 	const option2Values =
 		(await elementSelector(
@@ -252,30 +256,32 @@ async function GetOption2AndOption1(page, data, option3Values, option3Id, indexO
 	/**************************************************
 	 *          Iterate over option 2 IDs             *
 	 **************************************************/
-	option2IDs.forEach(async (option2Id, indexOption2Id) => {
+	for (let indexOption2Id = 0; indexOption2Id < option2IDs.length; indexOption2Id++) {
 		if (data.clickOption2.selector.length && indexOption2Id > 0) {
 			// Click on option 2
-			await elementClick(page, data.clickOption2.selector, option2Id, 0);
+			await elementClick(page, data.clickOption2.selector, option2IDs[indexOption2Id], 0);
 		}
 
-		arrayOption2 = await GetOption1(
+		arrayOptions = await GetOption1(
 			page,
 			data,
 			option3Values,
 			option3Id,
 			indexOption3Id,
 			option2Values,
-			option2Id,
+			option2IDs[indexOption2Id],
 			indexOption2Id,
-			arrayOption2
+			arrayOptions
 		);
-	});
-	return arrayOption2;
+	}
+
+	return arrayOptions;
 }
 
 // Get option 3 and option 2 and option 1
 async function GetOption3AndOption2AndOption1(page, data) {
 	let arrayOptions = [];
+	if (data.option3.selectors.length === 0) return arrayOptions;
 	// Get option 3 values
 	const option3Values =
 		(await elementSelector(
@@ -302,13 +308,22 @@ async function GetOption3AndOption2AndOption1(page, data) {
 	/**************************************************
 	 *          Iterate over option 3 IDs             *
 	 **************************************************/
-	option3IDs.forEach(async (option3Id, indexOption3Id) => {
+
+	for (let indexOption3Id = 0; indexOption3Id < option3IDs.length; indexOption3Id++) {
 		if (data.clickOption3.selector.length && indexOption3Id > 0) {
 			// Click on option 3
-			await elementClick(page, data.clickOption3.selector, option3Values[indexOption3Id], 0);
+			await elementClick(page, data.clickOption3.selector, option3IDs[indexOption3Id], 0);
 		}
-		arrayOptions = await GetOption2AndOption1(page, data, option3Values, option3Id, indexOption3Id, arrayOptions);
-	});
+
+		arrayOptions = await GetOption2AndOption1(
+			page,
+			data,
+			option3Values,
+			option3IDs[indexOption3Id],
+			indexOption3Id,
+			arrayOptions
+		);
+	}
 
 	return arrayOptions;
 }

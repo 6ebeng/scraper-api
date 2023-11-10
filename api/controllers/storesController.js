@@ -391,7 +391,17 @@ async function search(req, res) {
 		// } else {
 		// }
 
-		response.variants = await GetOption1(page, data, null, null, null, null, null, null, []);
+		const option3AndOption2AndOption1 = await GetOption3AndOption2AndOption1(page, data);
+		const option2AndOption1 = await GetOption2AndOption1(page, data, null, null, null, []);
+		const option1 = await GetOption1(page, data, null, null, null, null, null, null, []);
+
+		response.variants = option3AndOption2AndOption1.length
+			? option3AndOption2AndOption1
+			: option2AndOption1.length
+			? option2AndOption1
+			: option1.length
+			? option1
+			: [];
 
 		response.message = 'success';
 		console.log('\x1b[32m%s\x1b[0m', 'Succeed response'); //green
