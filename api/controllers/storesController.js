@@ -96,14 +96,15 @@ async function search(req, res) {
 				stealth({
 					enabledEvasions: new Set([
 						/* evasions for headless only
-      'chrome.app',
-      'chrome.csi',
-      'chrome.loadTimes',
-      'chrome.runtime',
-      'navigator.permissions',
-      'navigator.plugins',
-      'window.outerdimensions'
-      */
+						'chrome.app',
+						'chrome.csi',
+						'chrome.loadTimes',
+						'chrome.runtime',
+						'navigator.permissions',
+						'navigator.plugins',
+						'window.outerdimensions'
+						*/
+
 						//launch args (the webdriver fix is very much needed depending on how you launch chrome, just the method changed in v89) and sourceurl
 						'defaultArgs',
 						// appears to be necessary to prevent iframe issues? https://github.com/puppeteer/puppeteer/issues/1106
@@ -115,9 +116,9 @@ async function search(req, res) {
 						// Strips puppeteer/CDP artifacts from stacktrace
 						'sourceurl',
 						/* thou shall not lie about thou hardware stack
-      'user-agent-override', // better off using this plugin manually than the default MSFT UA imo
-      'webgl.vendor', // Try and use common hardware instead
-      */
+						'user-agent-override', // better off using this plugin manually than the default MSFT UA imo
+						'webgl.vendor', // Try and use common hardware instead
+						*/
 					]),
 				})
 			);
@@ -152,8 +153,6 @@ async function search(req, res) {
 			vendor: 'Google Inc. (Intel)',
 			renderer: 'Intel, Intel(R) HD Graphics 4000 Direct3D11 vs_5_0 ps_5_0, D3D11',
 		}).onPageCreated(page);
-
-		//await require(`puppeteer-extra-plugin-stealth/evasions/navigator.languages`)(['en-US', 'en']).onPageCreated(page)
 
 		// Randomize proxy
 		var proxies = data.proxies[Math.floor(Math.random() * data.proxies.length)];
@@ -191,19 +190,11 @@ async function search(req, res) {
 		//Block unnecessary resource types and urls
 		await blockResources(page, data);
 
-		//console.log(await page.browser().userAgent())
-		// await bypassWebgl(page,userAgent,"Intel Inc.")
-		// Bypass detections
-		// await bypass(page)
-
 		// Go to page
 		await page.goto(req.body.handle, {
 			waitUntil: data.waitUntil,
 			timeout: 0,
 		});
-
-		// Print response headers while debugging
-		// if (data.debug) console.log(await response.headers());
 
 		// Randomly mouse movement to bypass detections
 		await page.mouse.move(100, Math.floor(Math.random() * 100));
@@ -245,10 +236,6 @@ async function search(req, res) {
 			});
 		}
 
-		// Wait for Response
-		// we need to use waitForResponse because we are dealing with AJAX - no page navigation
-		//await page.waitForResponse((response) => response.status() === 200);
-
 		// Wait for Selector
 		if (data.container) {
 			// Correct the method to 'startsWith'
@@ -265,59 +252,6 @@ async function search(req, res) {
 			throw new Error('Container is empty, please check your selector');
 		}
 
-		// /* Load Page Content */
-		// var $ = cheerio.load(await page.content());
-
-		/* Check Product Sizes */
-		// let Size = req.body.Size;
-
-		// if (Size) { // Size is optional
-
-		//   // Not Instock sizes
-		//   let requiredSize = Size.toString();
-		//   var NotInStockSizes = await elementSelector(page, data.notInStockSizes.selectors, data.notInStockSizes.attribute || null, data.notInStockSizes.regex || null, data.notInStockSizes.groups || [], true)
-		//   var isOutStock
-		//   if (data.debug) console.log(NotInStockSizes)
-		//   NotInStockSizes.forEach(item => { if (item.trim() === requiredSize.trim()) isOutStock = true })
-		//   if (isOutStock) {
-		//     return res.status(500).json({
-		//       Data: {},
-		//       Message: `Size ${Size} is Out Of Stock!`
-		//     });
-		//   }
-
-		// InStock Sizes
-		// var InStockSizes = await elementSelector(
-		// 	page,
-		// 	data.inStockSizes.selectors,
-		// 	data.inStockSizes.attribute || null,
-		// 	data.inStockSizes.regex || null,
-		// 	data.inStockSizes.groups || [],
-		// 	true
-		// );
-		// var isInstock
-		//   InStockSizes.forEach(item => { if (item.trim() === requiredSize.trim()) isInstock = true })
-		//   if (data.debug) console.log(InStockSizes)
-		//   if (!isInstock) {
-		//     return res.status(500).json({
-		//       Data: {},
-		//       Message: `Size ${Size} is not available!`
-		//     });
-		//   }
-
-		//   // Click Size to appear the true price
-		//   if (isInstock) {
-		//     if (data.clickSize) {
-		//       await elementClick(page,
-		//         data.clickSize.replace("{{size}}", Size.trim())
-		//       );
-		//       await delay(2000);
-		//     }
-		//   }
-		// }
-
-		// /* Load Page Content */
-		// var $ = cheerio.load(await page.content()); //it changes to jquery
 		const response = {};
 
 		response.handle = req.body.handle;

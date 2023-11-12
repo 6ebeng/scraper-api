@@ -55,7 +55,7 @@ app.use(function (req, res, next) {
 
 /* Add UUID to each log request */
 app.use((req, res, next) => {
-	req.id = uuidv4();
+	req.id = uuidv4().split('-')[0];
 
 	const originalConsole = {
 		log: console.log,
