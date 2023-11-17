@@ -22,36 +22,16 @@ const {
 	GetOption2AndOption1,
 	GetOption1,
 	processDescriptions,
+	getStoreName,
 } = require('../helper/packages.js');
 
-let storesController = { search };
+async function scrapeProductData(req, res) {
+	// get handle from request body
+	const handle = req.body.handle;
 
-async function search(req, res) {
-	var browser;
-	/* To Check Validation json */
-	let errors = validationResult(req);
+	// Get store name
+	const store = await getStoreName(handle);
 
-	if (!errors.isEmpty()) {
-		return res.status(500).json({
-			Message: errors.array()[0].msg,
-		});
-	}
-
-	let handle = req.body.handle;
-	console.log('\x1b[34m%s\x1b[0m', handle);
-
-	var match = await handle.match(
-		'^((http[s]?|ftp)://)?/?([^/.]+.)*?([^/.]+.[^:/s.]{1,3}(.[^:/s.]{1,2})?(:d+)?)($|/)([^#?s]+)?(.*?)?(#[w-]+)?$'
-	);
-	let store = await match[4].replace(/\..+/g, '');
-
-	if (!(await isValidStore(store))) {
-		console.log('\x1b[33m%s\x1b[0m', handle);
-		return res.status(500).json({
-			data: {},
-			Message: `${store} is not supported!`,
-		});
-	}
 	const data = await require('../models/data/' + store);
 
 	const userAgents = [
@@ -88,6 +68,8 @@ async function search(req, res) {
 		args.push('--use-fake-device-for-media-stream');
 		args.push('--display=' + xvfb._display);
 	}
+
+	var browser;
 
 	/* Initialize Browser */
 	try {
@@ -353,4 +335,4 @@ async function search(req, res) {
 	}
 }
 
-module.exports = storesController;
+module.exports = { scrapeProductData };

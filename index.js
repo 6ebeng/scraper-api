@@ -4,12 +4,7 @@
  * Author : Tishko Rasoul (tishko.rasoul@gmail.com)
  */
 
-const app = require('express')(),
-	cors = require('cors'),
-	http = require('http'),
-	compression = require('compression'),
-	bodyParser = require('body-parser'),
-	{ v4: uuidv4 } = require('uuid');
+const { app, cors, http, compression, bodyParser, uuidv4 } = require('./api/helper/packages');
 
 /* Require Enviornment File  */
 require('dotenv').config();

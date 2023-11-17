@@ -16,7 +16,9 @@ services:
     #     reservations:
     #       memory: 256M
     volumes:
-      - ./:/app/
+      - ./api:/app/api
+      - ./index.js:/app/index.js
+      - ./package.json:/app/package.json
     stdin_open: true
     tty: true
     env_file:
