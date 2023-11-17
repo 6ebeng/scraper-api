@@ -2,21 +2,35 @@ const { elementSelector } = require('./selector');
 const { cleanPrice } = require('./cleanPrice');
 const { elementClick } = require('./click');
 const { processUrl } = require('./processUrl');
+const { getStoreDomain } = require('./validate');
 
 // Resolve images url
-function fixImage(imageUrls) {
-	imageUrls.forEach((imageUrl, index) => {
-		if (imageUrl) {
-			if (!imageUrl.startsWith('https://')) {
-				if (imageUrl.startsWith('//')) {
-					imageUrls[index] = 'https:' + imageUrl;
-				} else {
-					imageUrls[index] = 'https://' + imageUrl;
-				}
+async function fixImage(page, imageUrls, hasDomainPrefix = false, removeParamsFromUrl = false) {
+	let domain = hasDomainPrefix ? await getStoreDomain(page.url()) : '';
+
+	return imageUrls.map((imageUrl) => {
+		if (!imageUrl) return imageUrl;
+
+		// Check if removeParamsFromUrl is not null and true
+		if (removeParamsFromUrl !== null && removeParamsFromUrl) {
+			imageUrl = imageUrl.split('?')[0];
+		}
+
+		if (!imageUrl.includes(domain)) {
+			// Add domain prefix if needed
+			if (hasDomainPrefix && !imageUrl.startsWith('http')) {
+				imageUrl = imageUrl.startsWith('/') ? imageUrl : '/' + imageUrl;
+				return `${domain}${imageUrl}`;
 			}
 		}
+
+		// Ensure the URL starts with 'https://'
+		if (!imageUrl.startsWith('https://')) {
+			return imageUrl.startsWith('//') ? 'https:' + imageUrl : 'https://' + imageUrl;
+		}
+
+		return imageUrl;
 	});
-	return imageUrls;
 }
 
 // Get Clean price
@@ -95,7 +109,8 @@ async function GetOption1(
 		await elementClick(page, data.clickImage.selector, '', data.clickImage.delayTime);
 
 	// Image srcs
-	const imageSrcs = fixImage(
+	const imageSrcs = await fixImage(
+		page,
 		await elementSelector(
 			page,
 			data.imageSrc.selectors,
@@ -104,7 +119,9 @@ async function GetOption1(
 			data.imageSrc.groups,
 			true,
 			data.imageSrc.valueToReplace
-		)
+		),
+		data.imageSrc.hasDomainPrefix,
+		data.imageSrc.removeParamsFromUrl
 	);
 
 	// if imageSrcs is empty

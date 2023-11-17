@@ -247,6 +247,8 @@
 	},
 	"imageSrc": {
 		"selectors": ["img.zoom-thumbnail[alt]"],
+		"hasDomainPrefix": false,
+		"removeParamsFromUrl": true,
 		"attribute": "src",
 		"regex": "",
 		"groups": [],

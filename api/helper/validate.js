@@ -28,6 +28,15 @@ async function getStoreName(handle) {
 	return await match[4].replace(/\..+/g, '');
 }
 
+async function getStoreDomain(handle) {
+	var match = await handle.match(
+		'^((http[s]?|ftp)://)?/?([^/.]+.)*?([^/.]+.[^:/s.]{1,3}(.[^:/s.]{1,2})?(:d+)?)($|/)([^#?s]+)?(.*?)?(#[w-]+)?$'
+	);
+	//concat groups 1,3,4
+	concatGroups = (await match[1]) + (await match[3]) + (await match[4]);
+	return await concatGroups.replace(/\/[^\/]*$/g, '');
+}
+
 /* To Check Validation json using validationResult */
 async function checkJsonValidation(req, res) {
 	let errors = validationResult(req);
@@ -67,4 +76,4 @@ async function validate(req, res, next) {
 	next();
 }
 
-module.exports = { validate, isValidStore, getStoreName, checkJsonValidation };
+module.exports = { validate, isValidStore, getStoreName, checkJsonValidation, getStoreDomain };

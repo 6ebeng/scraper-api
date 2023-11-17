@@ -21,6 +21,7 @@ const {
 	GetOption1,
 	processDescriptions,
 	getStoreName,
+	getStoreDomain,
 } = require('../helper/packages.js');
 
 async function scrapeProductData(req, res) {
