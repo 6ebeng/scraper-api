@@ -20,7 +20,10 @@ const puppeteer = require('puppeteer-extra'),
 	{ isValidStore } = require('./validate'),
 	{ blockResources } = require('./blockResources'),
 	{ cleanPrice } = require('./cleanPrice'),
-	{ GetOption3AndOption2AndOption1, GetOption2AndOption1, GetOption1 } = require('./getVariants');
+	{ GetOption3AndOption2AndOption1, GetOption2AndOption1, GetOption1 } = require('./getVariants'),
+	{ htmlSelector } = require('./htmlSelector'),
+	{ processDescriptions } = require('./descriptionBuilder'),
+	{ processUrl } = require('./processUrl');
 
 module.exports = {
 	delay,
@@ -41,4 +44,7 @@ module.exports = {
 	GetOption3AndOption2AndOption1,
 	GetOption2AndOption1,
 	GetOption1,
+	htmlSelector,
+	processDescriptions,
+	processUrl,
 };

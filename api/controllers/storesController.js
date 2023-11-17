@@ -21,6 +21,7 @@ const {
 	GetOption3AndOption2AndOption1,
 	GetOption2AndOption1,
 	GetOption1,
+	processDescriptions,
 } = require('../helper/packages.js');
 
 let storesController = { search };
@@ -271,20 +272,7 @@ async function search(req, res) {
 			response.title = title || '';
 		}
 
-		const descriptions = await elementSelector(
-			page,
-			data.descriptions.selectors,
-			data.descriptions.attribute,
-			data.descriptions.regex,
-			data.descriptions.groups,
-			true,
-			data.descriptions.valueToReplace
-		);
-		if (Array.isArray(descriptions)) {
-			response.descriptions = descriptions.join(' ');
-		} else {
-			response.descriptions = descriptions || '';
-		}
+		response.description = await processDescriptions(page, data);
 
 		const vendor =
 			data.vendor.name ||

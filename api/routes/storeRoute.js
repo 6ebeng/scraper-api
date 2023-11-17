@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 /*
  * Purpose : For All Website API's Routing
@@ -6,12 +6,12 @@
  * Developed By  : Tishko Rasoul (tishko.rasoul@gmail.com)
  */
 
-const express = require("express"),
-  router = express.Router(),
-  storeController = require("../controllers/storesController"),
-  { validate } = require("../helper/validate");
+const express = require('express'),
+	router = express.Router(),
+	storeController = require('../controllers/storesController'),
+	{ validate } = require('../helper/validate');
 
 /*Website Routings */
-router.post("/search", validate("search"), storeController.search);
+router.post('/search', validate('search'), storeController.search);
 
 module.exports = router;

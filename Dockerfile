@@ -9,6 +9,6 @@ RUN export DISPLAY=:10
 
 WORKDIR /app
 COPY package.json ./
-RUN yarn install --production && yarn cache clean
+RUN yarn install && yarn cache clean
 COPY . .
 CMD [ "yarn","dev" ]

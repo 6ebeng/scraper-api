@@ -1,6 +1,7 @@
 const { elementSelector } = require('./selector');
 const { cleanPrice } = require('./cleanPrice');
 const { elementClick } = require('./click');
+const { processUrl } = require('./processUrl');
 
 // Resolve images url
 function fixImage(imageUrls) {
@@ -74,17 +75,19 @@ async function GetOption1(
 
 	if (OutOfStockSTDIndicator.length === 0) {
 		// Option 1 values
-		option1Values = (await elementSelector(
+		option1Values = await elementSelector(
 			page,
 			data.option1.selectors,
 			data.option1.attribute,
 			data.option1.regex,
 			data.option1.groups,
 			true,
-			data.option1.valueToReplace || []
-		)) || ['STD'];
-	} else {
-		option1Values = ['STD'];
+			data.option1.valueToReplace
+		);
+
+		option1Values.length > 0 && data.OutOfStockSTDIndicator.selectors.length === 0
+			? (option1Values = ['STD'])
+			: option1Values;
 	}
 
 	// Click on image
@@ -108,17 +111,22 @@ async function GetOption1(
 	if (imageSrcs.length === 0) throw new Error('Images are empty, please check your selector');
 
 	if (!data.clickOption1.selector.length) {
-		sku = (
-			await elementSelector(
-				page,
-				data.sku.selectors,
-				data.sku.attribute,
-				data.sku.regex,
-				data.sku.groups,
-				false,
-				data.sku.valueToReplace
-			)
-		)[0];
+		// get sku from url
+		if (data.sku.skufromUrl) {
+			sku = processUrl(await page.url(), data.sku.regex, data.sku.groups, data.sku.valueToReplace);
+		} else {
+			sku = (
+				await elementSelector(
+					page,
+					data.sku.selectors,
+					data.sku.attribute,
+					data.sku.regex,
+					data.sku.groups,
+					false,
+					data.sku.valueToReplace
+				)
+			)[0];
+		}
 
 		// Get price
 		price = await GetCleanPrice(page, data);
@@ -143,17 +151,19 @@ async function GetOption1(
 			// Get price
 			price = await GetCleanPrice(page, data);
 
-			sku = (
-				await elementSelector(
-					page,
-					data.sku.selectors,
-					data.sku.attribute,
-					data.sku.regex,
-					data.sku.groups,
-					false,
-					data.sku.valueToReplace
-				)
-			)[0];
+			if (!data.sku.skufromUrl) {
+				sku = (
+					await elementSelector(
+						page,
+						data.sku.selectors,
+						data.sku.attribute,
+						data.sku.regex,
+						data.sku.groups,
+						false,
+						data.sku.valueToReplace
+					)
+				)[0];
+			}
 		}
 
 		// options array to return
@@ -209,6 +219,7 @@ async function GetOption1(
 			quantity = 5;
 		}
 
+		// Get image src
 		const imageSrc = imageSrcs[index] || '';
 
 		const option = {
@@ -221,7 +232,7 @@ async function GetOption1(
 			imageSrc: imageSrc || '',
 		};
 
-		arrayOptions.push(option);
+		options.length !== 0 && option1Values.length !== 0 ? arrayOptions.push(option) : arrayOptions;
 	}
 	return arrayOptions;
 }

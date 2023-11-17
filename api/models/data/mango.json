@@ -66,6 +66,19 @@
 	},
 	"descriptions": {
 		"selectors": ["p.product-info-text"],
+		"isHTML": true,
+		"attribute": "",
+		"regex": "",
+		"groups": [],
+		"valueToReplace": [
+			{
+				"value": "sssss",
+				"replaceWith": ""
+			}
+		]
+	},
+	"tableDescriptions": {
+		"selectors": [],
 		"attribute": "",
 		"regex": "",
 		"groups": [],
@@ -119,6 +132,7 @@
 	},
 	"sku": {
 		"selectors": ["span.product-reference"],
+		"skufromUrl": false,
 		"attribute": "",
 		"regex": "",
 		"groups": [],
