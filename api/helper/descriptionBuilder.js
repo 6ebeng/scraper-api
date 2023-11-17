@@ -14,9 +14,31 @@ function createList(items) {
 }
 
 // Function to create an HTML table from an array
-function createTable(items) {
-	const tableRows = items.map((item) => `<tr><td>${item}</td></tr>`).join('');
-	return `<table><tbody>${tableRows}</tbody></table>`;
+// Function to create an HTML table from an array with specific row logic
+function createTable(items, numberOfCol = 5, hasTableHeader = false) {
+	numberOfCol = numberOfCol || 5; // Ensure numberOfCol is set
+
+	const createRow = (rowData, isHeader = false) => {
+		const tag = isHeader ? 'th' : 'td';
+		return `<tr>${rowData.map((item) => `<${tag}>${item}</${tag}>`).join('')}</tr>`;
+	};
+
+	let currentRowData = [];
+	let tableRows = items.reduce((acc, item, index) => {
+		currentRowData.push(item);
+
+		const isRowEnd = index % numberOfCol === numberOfCol - 1 || index === items.length - 1;
+		if (isRowEnd) {
+			// If hasTableHeader is true and this is the first row, create a header row
+			const isHeaderRow = hasTableHeader && acc.length === 0;
+			acc.push(createRow(currentRowData, isHeaderRow));
+			currentRowData = []; // Reset for the next row
+		}
+
+		return acc;
+	}, []);
+
+	return `<table><tbody>${tableRows.join('')}</tbody></table>`;
 }
 
 async function processDescriptions(page, data) {
@@ -64,7 +86,11 @@ async function processDescriptions(page, data) {
 
 	// Append HTML descriptions in a table
 	if (tableDescriptions.length) {
-		tempDescription += createTable(tableDescriptions);
+		tempDescription += createTable(
+			tableDescriptions,
+			data.tableDescriptions.numberOfCol,
+			data.tableDescriptions.hasTableHeader
+		);
 	}
 
 	return tempDescription;

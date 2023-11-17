@@ -72,13 +72,15 @@
 		"groups": [],
 		"valueToReplace": [
 			{
-				"value": "sssss",
+				"value": "",
 				"replaceWith": ""
 			}
 		]
 	},
 	"tableDescriptions": {
-		"selectors": [],
+		"selectors": ["p.product-info-text > span"],
+		"hasTableHeader": true,
+		"numberOfCol": 2,
 		"attribute": "",
 		"regex": "",
 		"groups": [],
