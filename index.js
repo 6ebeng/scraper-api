@@ -83,7 +83,7 @@ app.use((req, res, next) => {
 });
 
 /* API Routings */
-app.use('/api', require('./api/routes/storeRoute'));
+app.use('/api', require('./api/routes/api/v1'));
 
 /* Redirect On Website */
 app.get('/', function (req, res) {

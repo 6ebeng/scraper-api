@@ -46,33 +46,38 @@ async function processDescriptions(page, data) {
 
 	// Process normal descriptions
 	let descriptions = [];
-	if (data.descriptions.selectors.length) {
-		if (data.descriptions.isHTML) {
-			descriptions = await htmlSelector(page, data.descriptions.selectors, true, data.descriptions.valueToReplace);
+	if (data.productConfig.descriptions.selectors.length) {
+		if (data.productConfig.descriptions.isHTML) {
+			descriptions = await htmlSelector(
+				page,
+				data.productConfig.descriptions.selectors,
+				true,
+				data.productConfig.descriptions.valueToReplace
+			);
 		} else {
 			descriptions = await elementSelector(
 				page,
-				data.descriptions.selectors,
-				data.descriptions.attribute,
-				data.descriptions.regex,
-				data.descriptions.groups,
+				data.productConfig.descriptions.selectors,
+				data.productConfig.descriptions.attribute,
+				data.productConfig.descriptions.regex,
+				data.productConfig.descriptions.groups,
 				true,
-				data.descriptions.valueToReplace
+				data.productConfig.descriptions.valueToReplace
 			);
 		}
 	}
 
 	// Process HTML descriptions
 	let tableDescriptions = [];
-	if (data.descriptions.selectors.length) {
+	if (data.productConfig.descriptions.selectors.length) {
 		tableDescriptions = await elementSelector(
 			page,
-			data.tableDescriptions.selectors,
-			data.tableDescriptions.attribute,
-			data.tableDescriptions.regex,
-			data.tableDescriptions.groups,
+			data.productConfig.tableDescriptions.selectors,
+			data.productConfig.tableDescriptions.attribute,
+			data.productConfig.tableDescriptions.regex,
+			data.productConfig.tableDescriptions.groups,
 			true,
-			data.tableDescriptions.valueToReplace
+			data.productConfig.tableDescriptions.valueToReplace
 		);
 	}
 
@@ -88,8 +93,8 @@ async function processDescriptions(page, data) {
 	if (tableDescriptions.length) {
 		tempDescription += createTable(
 			tableDescriptions,
-			data.tableDescriptions.numberOfCol,
-			data.tableDescriptions.hasTableHeader
+			data.productConfig.tableDescriptions.numberOfCol,
+			data.productConfig.tableDescriptions.hasTableHeader
 		);
 	}
 

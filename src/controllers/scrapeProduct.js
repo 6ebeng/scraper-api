@@ -24,7 +24,7 @@ const {
 	getStoreDomain,
 } = require('../helper/packages.js');
 
-async function scrapeProductData(req, res) {
+async function scrapeProduct(req, res) {
 	// get handle from request body
 	const handle = req.body.handle;
 
@@ -219,14 +219,18 @@ async function scrapeProductData(req, res) {
 		}
 
 		// Wait for Selector
-		if (data.container) {
+		if (data.productConfig.container) {
 			// Correct the method to 'startsWith'
-			if (data.container.startsWith('//') || data.container.startsWith('(//') || data.container.startsWith('((//')) {
-				await page.waitForXPath(data.container, {
+			if (
+				data.productConfig.container.startsWith('//') ||
+				data.productConfig.container.startsWith('(//') ||
+				data.productConfig.container.startsWith('((//')
+			) {
+				await page.waitForXPath(data.productConfig.container, {
 					timeout: 30000,
 				});
 			} else {
-				await page.waitForSelector(data.container, {
+				await page.waitForSelector(data.productConfig.container, {
 					timeout: 30000,
 				});
 			}
@@ -240,12 +244,12 @@ async function scrapeProductData(req, res) {
 
 		const title = await elementSelector(
 			page,
-			data.title.selectors,
-			data.title.attribute,
-			data.title.regex,
-			data.title.groups,
+			data.productConfig.title.selectors,
+			data.productConfig.title.attribute,
+			data.productConfig.title.regex,
+			data.productConfig.title.groups,
 			true,
-			data.title.valueToReplace
+			data.productConfig.title.valueToReplace
 		);
 		if (Array.isArray(title)) {
 			response.title = title.join(' ');
@@ -256,15 +260,15 @@ async function scrapeProductData(req, res) {
 		response.description = await processDescriptions(page, data);
 
 		const vendor =
-			data.vendor.name ||
+			data.productConfig.vendor.name ||
 			(await elementSelector(
 				page,
-				data.vendor,
-				data.vendor.attribute,
-				data.vendor.regex,
-				data.vendor.groups,
+				data.productConfig.vendor,
+				data.productConfig.vendor.attribute,
+				data.productConfig.vendor.regex,
+				data.productConfig.vendor.groups,
 				true,
-				data.vendor.valueToReplace
+				data.productConfig.vendor.valueToReplace
 			));
 		if (Array.isArray(vendor)) {
 			response.vendor = vendor.join(' ');
@@ -274,12 +278,12 @@ async function scrapeProductData(req, res) {
 
 		const category = await elementSelector(
 			page,
-			data.category.selectors,
-			data.category.attribute,
-			data.category.regex,
-			data.category.groups,
+			data.productConfig.category.selectors,
+			data.productConfig.category.attribute,
+			data.productConfig.category.regex,
+			data.productConfig.category.groups,
 			true,
-			data.category.valueToReplace
+			data.productConfig.category.valueToReplace
 		);
 		if (Array.isArray(category)) {
 			response.category = category.join(' ');
@@ -287,9 +291,9 @@ async function scrapeProductData(req, res) {
 			response.category = category.trim() || '';
 		}
 
-		// if (data.option3.selectors.length) {
+		// if (data.productConfig.option3.selectors.length) {
 		// 	response.variants = await GetOption3AndOption2AndOption1(page, data);
-		// } else if (data.option2.selectors.length) {
+		// } else if (data.productConfig.option2.selectors.length) {
 		// 	response.variants = await GetOption2AndOption1(page, data, null, null, null, []);
 		// } else {
 		// }
@@ -334,4 +338,4 @@ async function scrapeProductData(req, res) {
 	}
 }
 
-module.exports = { scrapeProductData };
+module.exports = { scrapeProduct };

@@ -8,10 +8,10 @@
 
 const express = require('express'),
 	router = express.Router(),
-	{ scrapeProductData } = require('../controllers/scrapeProductData'),
-	{ validate } = require('../helper/packages');
+	{ scrapeProduct } = require('../../../controllers/scrapeProduct'),
+	{ validate } = require('../../../helper/packages');
 
 /*Website Routings */
-router.post('/search', validate, scrapeProductData);
+router.post('/search', validate, scrapeProduct);
 
 module.exports = router;

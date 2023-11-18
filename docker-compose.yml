@@ -16,7 +16,7 @@ services:
     #     reservations:
     #       memory: 256M
     volumes:
-      - ./api:/app/api
+      - ./src:/app/src
       - ./index.js:/app/index.js
       - ./package.json:/app/package.json
     stdin_open: true

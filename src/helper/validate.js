@@ -13,7 +13,7 @@ function validateBody(method) {
 
 async function isValidStore(store) {
 	if (
-		Array.from(fs.readdirSync('./api/models/data'))
+		Array.from(fs.readdirSync('./src/models/data'))
 			.map((e) => e.replace('.json', ''))
 			.includes(store)
 	)
