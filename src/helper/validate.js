@@ -64,14 +64,13 @@ async function validate(req, res, next) {
 	// Check if store is supported
 	if (!(await isValidStore(store))) {
 		// msg red Console store name not supported
-		console.log('\x1b[31m%s\x1b[0m', `${store} is not supported!`);
+		req.logger.log('\x1b[31m%s\x1b[0m', `${store} is not supported!`);
 
 		return res.status(500).json({
 			message: `${store} is not supported!`,
 		});
 	}
-
-	console.log('\x1b[34m%s\x1b[0m', handle);
+	req.logger.log('\x1b[34m%s\x1b[0m', handle);
 
 	next();
 }

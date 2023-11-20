@@ -2,7 +2,7 @@
 
 const { delay } = require('./delay');
 
-async function elementClick(page, selector, valueToReplace, delayTime = 0) {
+async function elementClick(req, page, selector, valueToReplace, delayTime = 0) {
 	// Replace the placeholder in selector if needed
 	selector = valueToReplace ? selector.replace('{{valueToReplace}}', valueToReplace.trim()) : selector;
 
@@ -17,12 +17,12 @@ async function elementClick(page, selector, valueToReplace, delayTime = 0) {
 	const elementToClick = isXPath ? (await page.$x(selector))[0] : await page.$(selector);
 	if (elementToClick) {
 		// yellow color console
-		console.log('\x1b[33m%s\x1b[0m', 'Element found, clicking:', selector);
+		req.logger.log('\x1b[33m%s\x1b[0m', 'Element found, clicking:', selector);
 		await elementToClick.evaluate((b) => b.click());
 		await page.waitForNetworkIdle();
 		await delay(delayTime);
 	} else {
-		console.log('Element not found to click:', selector);
+		req.logger.log('Element not found to click:', selector);
 	}
 }
 

@@ -1,4 +1,4 @@
-async function mainSelector(page, selector, attribute) {
+async function mainSelector(req, page, selector, attribute) {
 	try {
 		return await page.evaluate(
 			async ({ selector, attribute }) => {
@@ -40,7 +40,7 @@ async function mainSelector(page, selector, attribute) {
 			{ selector, attribute }
 		);
 	} catch (error) {
-		console.log('\x1b[31m%s\x1b[0m', `Error with selector ${selector} > ${error}`);
+		req.logger.log('\x1b[31m%s\x1b[0m', `Error with selector ${selector} > ${error}`);
 		return []; // Return an empty array if there's an error
 	}
 }
@@ -60,7 +60,7 @@ function replaceValues(value, replacements) {
 	return value.trim();
 }
 
-async function elementSelector(page, selectors, attribute, regex, groups, queryAll, valueToReplace) {
+async function elementSelector(req, page, selectors, attribute, regex, groups, queryAll, valueToReplace) {
 	if (!Array.isArray(selectors)) {
 		throw new Error('selectors must be an array');
 	}
@@ -71,11 +71,11 @@ async function elementSelector(page, selectors, attribute, regex, groups, queryA
 	let selectedValues = [];
 
 	for (const selector of selectors) {
-		const elements = await mainSelector(page, selector, attribute);
+		const elements = await mainSelector(req, page, selector, attribute);
 
 		if (elements.length === 0) {
 			//Grey color warn console
-			console.log('\x1b[90m%s\x1b[0m', `Error selector "${selector}" returned 0 elements`);
+			req.logger.log('\x1b[90m%s\x1b[0m', `Error selector "${selector}" returned 0 elements`);
 			continue; // Skip to the next selector if no elements are found
 		}
 

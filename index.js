@@ -4,7 +4,7 @@
  * Author : Tishko Rasoul (tishko.rasoul@gmail.com)
  */
 
-const { app, cors, http, compression, bodyParser, uuidv4 } = require('./src/helper/packages');
+const { app, cors, http, compression, bodyParser, uuidv4, util } = require('./src/helper/packages');
 
 /* Require Enviornment File  */
 require('dotenv').config();
@@ -49,36 +49,19 @@ app.use(function (req, res, next) {
 });
 
 /* Add UUID to each log request */
+function createLoggerWithId(reqId) {
+	return {
+		log: (...args) => console.log(`[${reqId}]`, util.format(...args)),
+		error: (...args) => console.error(`[${reqId}]`, util.format(...args)),
+		warn: (...args) => console.warn(`[${reqId}]`, util.format(...args)),
+		info: (...args) => console.info(`[${reqId}]`, util.format(...args)),
+	};
+}
+
+// Middleware to add UUID and a bound logger to each request
 app.use((req, res, next) => {
 	req.id = uuidv4().split('-')[0];
-
-	const originalConsole = {
-		log: console.log,
-		error: console.error,
-		warn: console.warn,
-		info: console.info,
-	};
-
-	const overrideConsole =
-		(method) =>
-		(...args) => {
-			// Prepend the UUID to the first argument
-			args[0] = `[${req.id}] ` + args[0];
-			originalConsole[method].apply(console, args);
-		};
-
-	console.log = overrideConsole('log');
-	console.error = overrideConsole('error');
-	console.warn = overrideConsole('warn');
-	console.info = overrideConsole('info');
-
-	res.on('finish', () => {
-		console.log = originalConsole.log;
-		console.error = originalConsole.error;
-		console.warn = originalConsole.warn;
-		console.info = originalConsole.info;
-	});
-
+	req.logger = createLoggerWithId(req.id);
 	next();
 });
 

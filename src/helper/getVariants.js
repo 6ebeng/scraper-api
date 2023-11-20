@@ -34,10 +34,11 @@ async function fixImage(page, imageUrls, hasDomainPrefix = false, removeParamsFr
 }
 
 // Get Clean price
-async function GetCleanPrice(page, data) {
+async function GetCleanPrice(req, page, data) {
 	const price = cleanPrice(
 		(
 			await elementSelector(
+				req,
 				page,
 				data.productConfig.price.selectors,
 				data.productConfig.price.attribute,
@@ -62,6 +63,7 @@ async function GetCleanPrice(page, data) {
 
 // Get option 1
 async function GetOption1(
+	req,
 	page,
 	data,
 	option3Values,
@@ -84,13 +86,22 @@ async function GetOption1(
 
 	if (data.productConfig.OutOfStockSTDIndicator.selectors.length > 0) {
 		OutOfStockSTDIndicator =
-			(await elementSelector(page, data.productConfig.OutOfStockSTDIndicator.selectors, null, null, null, true, [])) ||
-			[];
+			(await elementSelector(
+				req,
+				page,
+				data.productConfig.OutOfStockSTDIndicator.selectors,
+				null,
+				null,
+				null,
+				true,
+				[]
+			)) || [];
 	}
 
 	if (OutOfStockSTDIndicator.length === 0) {
 		// Option 1 values
 		option1Values = await elementSelector(
+			req,
 			page,
 			data.productConfig.option1.selectors,
 			data.productConfig.option1.attribute,
@@ -107,12 +118,13 @@ async function GetOption1(
 
 	// Click on image
 	if (data.productConfig.clickImage.selector !== '')
-		await elementClick(page, data.productConfig.clickImage.selector, '', data.productConfig.clickImage.delayTime);
+		await elementClick(req, page, data.productConfig.clickImage.selector, '', data.productConfig.clickImage.delayTime);
 
 	// Image srcs
 	const imageSrcs = await fixImage(
 		page,
 		await elementSelector(
+			req,
 			page,
 			data.productConfig.imageSrc.selectors,
 			data.productConfig.imageSrc.attribute,
@@ -140,6 +152,7 @@ async function GetOption1(
 		} else {
 			sku = (
 				await elementSelector(
+					req,
 					page,
 					data.productConfig.sku.selectors,
 					data.productConfig.sku.attribute,
@@ -152,7 +165,7 @@ async function GetOption1(
 		}
 
 		// Get price
-		price = await GetCleanPrice(page, data);
+		price = await GetCleanPrice(req, page, data);
 
 		// Get url after click
 		variantHandle = page.url();
@@ -166,7 +179,7 @@ async function GetOption1(
 		// Check if clickOption1 is set
 		if (data.productConfig.clickOption1.selector.length) {
 			// Click on option 1
-			await elementClick(page, data.productConfig.clickOption1.selector, option1Values[index], 0);
+			await elementClick(req, page, data.productConfig.clickOption1.selector, option1Values[index], 0);
 
 			// Get url after click
 			variantHandle = page.url();
@@ -177,6 +190,7 @@ async function GetOption1(
 			if (!data.productConfig.sku.skufromUrl) {
 				sku = (
 					await elementSelector(
+						req,
 						page,
 						data.productConfig.sku.selectors,
 						data.productConfig.sku.attribute,
@@ -230,6 +244,7 @@ async function GetOption1(
 		if (data.productConfig.quantity.selectors.length && option1Values[index]) {
 			quantity = (
 				await elementSelector(
+					req,
 					page,
 					data.productConfig.quantity.selectors,
 					data.productConfig.quantity.attribute,
@@ -261,11 +276,12 @@ async function GetOption1(
 }
 
 // Get option 2 and option 1
-async function GetOption2AndOption1(page, data, option3Values, option3Id, indexOption3Id, arrayOptions = []) {
+async function GetOption2AndOption1(req, page, data, option3Values, option3Id, indexOption3Id, arrayOptions = []) {
 	if (data.productConfig.option2.selectors.length === 0) return arrayOptions;
 	// Get option 2 values
 	const option2Values =
 		(await elementSelector(
+			req,
 			page,
 			data.productConfig.option2.selectors || null,
 			data.productConfig.option2.attribute || null,
@@ -278,6 +294,7 @@ async function GetOption2AndOption1(page, data, option3Values, option3Id, indexO
 	// Get option 2 IDs
 	const option2IDs =
 		(await elementSelector(
+			req,
 			page,
 			data.productConfig.option2Id.selectors || null,
 			data.productConfig.option2Id.attribute || null,
@@ -293,10 +310,11 @@ async function GetOption2AndOption1(page, data, option3Values, option3Id, indexO
 	for (let indexOption2Id = 0; indexOption2Id < option2IDs.length; indexOption2Id++) {
 		if (data.productConfig.clickOption2.selector.length && indexOption2Id > 0) {
 			// Click on option 2
-			await elementClick(page, data.productConfig.clickOption2.selector, option2IDs[indexOption2Id], 0);
+			await elementClick(req, page, data.productConfig.clickOption2.selector, option2IDs[indexOption2Id], 0);
 		}
 
 		arrayOptions = await GetOption1(
+			req,
 			page,
 			data,
 			option3Values,
@@ -313,12 +331,13 @@ async function GetOption2AndOption1(page, data, option3Values, option3Id, indexO
 }
 
 // Get option 3 and option 2 and option 1
-async function GetOption3AndOption2AndOption1(page, data) {
+async function GetOption3AndOption2AndOption1(req, page, data) {
 	let arrayOptions = [];
 	if (data.productConfig.option3.selectors.length === 0) return arrayOptions;
 	// Get option 3 values
 	const option3Values =
 		(await elementSelector(
+			req,
 			page,
 			data.productConfig.option3.selectors,
 			data.productConfig.option3.attribute || null,
@@ -330,6 +349,7 @@ async function GetOption3AndOption2AndOption1(page, data) {
 
 	// Get option 3 IDs
 	const option3IDs = await elementSelector(
+		req,
 		page,
 		data.productConfig.option3Id.selectors,
 		data.productConfig.option3Id.attribute || null,
@@ -350,6 +370,7 @@ async function GetOption3AndOption2AndOption1(page, data) {
 		}
 
 		arrayOptions = await GetOption2AndOption1(
+			req,
 			page,
 			data,
 			option3Values,

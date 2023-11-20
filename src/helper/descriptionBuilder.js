@@ -13,7 +13,6 @@ function createList(items) {
 	return `<ul>${listItems}</ul></br>`;
 }
 
-// Function to create an HTML table from an array
 // Function to create an HTML table from an array with specific row logic
 function createTable(items, numberOfCol = 5, hasTableHeader = false) {
 	numberOfCol = numberOfCol || 5; // Ensure numberOfCol is set
@@ -41,7 +40,7 @@ function createTable(items, numberOfCol = 5, hasTableHeader = false) {
 	return `<table><tbody>${tableRows.join('')}</tbody></table>`;
 }
 
-async function processDescriptions(page, data) {
+async function processDescriptions(req, page, data) {
 	let tempDescription = '';
 
 	// Process normal descriptions
@@ -49,6 +48,7 @@ async function processDescriptions(page, data) {
 	if (data.productConfig.descriptions.selectors.length) {
 		if (data.productConfig.descriptions.isHTML) {
 			descriptions = await htmlSelector(
+				req,
 				page,
 				data.productConfig.descriptions.selectors,
 				true,
@@ -56,6 +56,7 @@ async function processDescriptions(page, data) {
 			);
 		} else {
 			descriptions = await elementSelector(
+				req,
 				page,
 				data.productConfig.descriptions.selectors,
 				data.productConfig.descriptions.attribute,
@@ -71,6 +72,7 @@ async function processDescriptions(page, data) {
 	let tableDescriptions = [];
 	if (data.productConfig.descriptions.selectors.length) {
 		tableDescriptions = await elementSelector(
+			req,
 			page,
 			data.productConfig.tableDescriptions.selectors,
 			data.productConfig.tableDescriptions.attribute,

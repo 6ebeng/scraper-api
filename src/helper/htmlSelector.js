@@ -1,4 +1,4 @@
-async function mainSelector(page, selector) {
+async function mainSelector(req, page, selector) {
 	try {
 		return await page.evaluate(
 			({ selector }) => {
@@ -65,7 +65,7 @@ async function mainSelector(page, selector) {
 			{ selector }
 		);
 	} catch (error) {
-		console.log('\x1b[31m%s\x1b[0m', `Error with selector ${selector} > ${error}`);
+		req.logger.log('\x1b[31m%s\x1b[0m', `Error with selector ${selector} > ${error}`);
 		return [];
 	}
 }
@@ -79,7 +79,7 @@ function replaceValues(value, replacements) {
 	return value.trim();
 }
 
-async function htmlSelector(page, selectors, queryAll, valueToReplace) {
+async function htmlSelector(req, page, selectors, queryAll, valueToReplace) {
 	if (!Array.isArray(selectors)) {
 		throw new Error('selectors must be an array');
 	}
@@ -90,10 +90,10 @@ async function htmlSelector(page, selectors, queryAll, valueToReplace) {
 	let selectedValues = [];
 
 	for (const selector of selectors) {
-		const elements = await mainSelector(page, selector);
+		const elements = await mainSelector(req, page, selector);
 
 		if (elements.length === 0) {
-			console.log('\x1b[90m%s\x1b[0m', `Error selector "${selector}" returned 0 elements`);
+			req.logger.log('\x1b[90m%s\x1b[0m', `Error selector "${selector}" returned 0 elements`);
 			continue;
 		}
 

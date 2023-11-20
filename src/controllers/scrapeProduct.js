@@ -182,13 +182,14 @@ async function waitForContainerLoad(page, data) {
 	}
 }
 
-async function scrapeProductData(page, data, handle) {
+async function scrapeProductData(req, page, data, handle) {
 	const response = {};
 	waitForContainerLoad(page, data);
 
 	response.handle = handle;
 
 	const title = await elementSelector(
+		req,
 		page,
 		data.productConfig.title.selectors,
 		data.productConfig.title.attribute,
@@ -203,11 +204,12 @@ async function scrapeProductData(page, data, handle) {
 		response.title = title || '';
 	}
 
-	response.description = await processDescriptions(page, data);
+	response.description = await processDescriptions(req, page, data);
 
 	const vendor =
 		data.productConfig.vendor.name ||
 		(await elementSelector(
+			req,
 			page,
 			data.productConfig.vendor,
 			data.productConfig.vendor.attribute,
@@ -223,6 +225,7 @@ async function scrapeProductData(page, data, handle) {
 	}
 
 	const category = await elementSelector(
+		req,
 		page,
 		data.productConfig.category.selectors,
 		data.productConfig.category.attribute,
@@ -237,9 +240,9 @@ async function scrapeProductData(page, data, handle) {
 		response.category = category.trim() || '';
 	}
 
-	const option3AndOption2AndOption1 = await GetOption3AndOption2AndOption1(page, data);
-	const option2AndOption1 = await GetOption2AndOption1(page, data, null, null, null, []);
-	const option1 = await GetOption1(page, data, null, null, null, null, null, null, []);
+	const option3AndOption2AndOption1 = await GetOption3AndOption2AndOption1(req, page, data);
+	const option2AndOption1 = await GetOption2AndOption1(req, page, data, null, null, null, []);
+	const option1 = await GetOption1(req, page, data, null, null, null, null, null, null, []);
 
 	response.variants = option3AndOption2AndOption1.length
 		? option3AndOption2AndOption1
@@ -330,17 +333,16 @@ async function scrapeProduct(req, res) {
 	const data = await require('../models/data/' + store);
 	const userAgent = selectUserAgent();
 	const { browser, xvfb } = await initializeBrowser(data, userAgent);
+	const page = await setupPageConfiguration(browser, userAgent, data);
 
 	try {
-		const page = await setupPageConfiguration(browser, userAgent, data);
-
 		// Go to page
 		await page.goto(req.body.handle, {
 			waitUntil: data.waitUntil,
 			timeout: 0,
 		});
 
-		// Randomly mouse movement to bypass detections
+		// Randomly mouse movement to avoid detections
 		await page.mouse.move(100, Math.floor(Math.random() * 100));
 		await page.mouse.move(200, Math.floor(Math.random() * 100));
 
@@ -349,11 +351,14 @@ async function scrapeProduct(req, res) {
 		await fs.promises.writeFile('./cookies.json', JSON.stringify(saveCookies, null, 2));
 		// Scroll to bottom
 		data.scrollToBottom && (await page.evaluate(scrollToBottom, { frequency: 200, timing: 0 }));
+
+		// debug
 		await debugPage(page, data, store);
 
-		const response = await scrapeProductData(page, data, handle);
-		console.log('\x1b[32m%s\x1b[0m', 'Succeed response');
+		// Scrape data
+		const response = await scrapeProductData(req, page, data, handle);
 
+		req.logger.log('\x1b[32m%s\x1b[0m', 'Succeed response');
 		return res.status(200).json(response);
 	} catch (e) {
 		await handleScrapeError(res, e);
