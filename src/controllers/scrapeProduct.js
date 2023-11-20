@@ -136,8 +136,8 @@ function selectRandomProxy(data) {
 	return [];
 }
 
-async function handleScrapeError(res, error) {
-	console.log('\x1b[31m%s\x1b[0m', error.message);
+async function handleScrapeError(req, res, error) {
+	req.logger.log('\x1b[31m%s\x1b[0m', error.message);
 	let message = error.message;
 	let statusCode = 500;
 	const messages = ['Waiting failed', 'Timeout exceeded while waiting for event'];
@@ -327,6 +327,16 @@ async function debugPage(page, data, store) {
 	}
 }
 
+async function randomMouseMovements(page) {
+	await page.mouse.move(100, Math.floor(Math.random() * 100));
+	await page.mouse.move(200, Math.floor(Math.random() * 100));
+}
+
+async function saveCookies(page) {
+	const saveCookies = await page.cookies();
+	await fs.promises.writeFile('./cookies.json', JSON.stringify(saveCookies, null, 2));
+}
+
 async function scrapeProduct(req, res) {
 	const handle = req.body.handle;
 	const store = await getStoreName(handle);
@@ -343,16 +353,15 @@ async function scrapeProduct(req, res) {
 		});
 
 		// Randomly mouse movement to avoid detections
-		await page.mouse.move(100, Math.floor(Math.random() * 100));
-		await page.mouse.move(200, Math.floor(Math.random() * 100));
+		await randomMouseMovements(page);
 
 		// Save cookies
-		const saveCookies = await page.cookies();
-		await fs.promises.writeFile('./cookies.json', JSON.stringify(saveCookies, null, 2));
-		// Scroll to bottom
-		data.scrollToBottom && (await page.evaluate(scrollToBottom, { frequency: 200, timing: 0 }));
+		await saveCookies(page);
 
-		// debug
+		// Scroll to bottom function use
+		data.productConfig.scrollToBottom && (await page.evaluate(scrollToBottom, { frequency: 200, timing: 0 }));
+
+		// debug page
 		await debugPage(page, data, store);
 
 		// Scrape data
@@ -361,7 +370,7 @@ async function scrapeProduct(req, res) {
 		req.logger.log('\x1b[32m%s\x1b[0m', 'Succeed response');
 		return res.status(200).json(response);
 	} catch (e) {
-		await handleScrapeError(res, e);
+		await handleScrapeError(req, res, e);
 	} finally {
 		await cleanup(browser, xvfb, data);
 	}

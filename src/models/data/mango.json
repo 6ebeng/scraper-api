@@ -1,7 +1,6 @@
 {
 	"debug": false,
 	"isHeadless": true,
-	"scrollToBottom": true,
 	"proxies": [],
 	"waitUntill": "domcontentloaded",
 	"blockResourceTypes": ["image", "media", "font", "other"],
@@ -52,10 +51,11 @@
 		"https://shop.mango.com/st-back-in-stock/backInStock"
 	],
 	"collectionConfig": {
+		"scrollToBottom": true,
 		"sortList": [],
 		"pageNumberParameter": "",
 		"sortParameter": "",
-		"totalPages": "",
+		"totalPages": 2,
 		"maxItemsToScrapeInCollection": 0,
 		"removeParamsFromUrl": true,
 		"skipUrlsById": {
@@ -69,6 +69,7 @@
 	},
 
 	"productConfig": {
+		"scrollToBottom": true,
 		"container": "//main[@class='product-detail']",
 		"title": {
 			"selectors": ["div.product-features > h1.product-name[itemprop]"],
