@@ -11,4 +11,5 @@ WORKDIR /app
 COPY package.json ./
 RUN yarn install && yarn cache clean
 COPY . .
+EXPOSE 4200
 CMD [ "yarn","dev" ]

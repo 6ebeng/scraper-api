@@ -11,7 +11,7 @@ const express = require('express'),
 	{ scrapeProduct } = require('../../../controllers/scrapeProduct'),
 	{ validate } = require('../../../helper/packages');
 
-/*Website Routings */
-router.post('/search', validate, scrapeProduct);
-
+/* Routings */
+router.post('/product', validate, scrapeProduct);
+router.post('/collection', validate, scrapeProduct);
 module.exports = router;

@@ -3,7 +3,7 @@ const { check, validationResult } = require('express-validator'),
 
 function validateBody(method) {
 	switch (method) {
-		case 'search':
+		case 'product':
 			{
 				return [check('handle').notEmpty().withMessage('handle field is required').trim()];
 			}
@@ -53,7 +53,7 @@ async function validate(req, res, next) {
 	const { handle } = req.body;
 
 	// validate request body handle field
-	validateBody('search');
+	validateBody('product');
 
 	/* Check Validation json using validationResult */
 	checkJsonValidation(req, res);

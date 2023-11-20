@@ -4,7 +4,7 @@
  * Author : Tishko Rasoul (tishko.rasoul@gmail.com)
  */
 
-const { app, cors, http, compression, bodyParser, uuidv4 } = require('./api/helper/packages');
+const { app, cors, http, compression, bodyParser, uuidv4 } = require('./src/helper/packages');
 
 /* Require Enviornment File  */
 require('dotenv').config();
@@ -83,7 +83,7 @@ app.use((req, res, next) => {
 });
 
 /* API Routings */
-app.use('/api', require('./api/routes/api/v1'));
+app.use('/api/v1', require('./src/routes/api/v1'));
 
 /* Redirect On Website */
 app.get('/', function (req, res) {
@@ -92,7 +92,7 @@ app.get('/', function (req, res) {
 
 /* Handle Invalid URL */
 app.all('*', (req, res, next) => {
-	res.status(404).json({ ResponseCode: 404, Message: `Can't find ${req.originalUrl} on this server!` });
+	res.status(404).json({ message: `Can't find ${req.originalUrl} on this server!` });
 });
 
 module.exports = { app };
